@@ -1,32 +1,47 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Linq;
 using WebBarberShopBooking.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, ILogger<HomeController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Lấy dữ liệu cần thiết cho trang chủ (ví dụ: dịch vụ nổi bật, sản phẩm mới, tin tức mới nhất)
-            var featuredServices = _context.Services.Take(3).ToList();
-            var newProducts = _context.Products.OrderByDescending(p => p.Id).Take(3).ToList();
-            var latestNews = _context.News.OrderByDescending(n => n.PublishDate).Take(3).ToList();
+            try
+            {
+                // Lấy tin tức mới nhất (tối đa 3 tin)
+                var latestNews = await _context.News
+                    .OrderByDescending(n => n.PublishDate)
+                    .Take(3)
+                    .ToListAsync();
 
-            ViewBag.FeaturedServices = featuredServices;
-            ViewBag.NewProducts = newProducts;
-            ViewBag.LatestNews = latestNews;
+                // Lấy dịch vụ nổi bật (ví dụ: có nhiều đánh giá tốt)
+                var featuredServices = await _context.Services.Take(4).ToListAsync(); // Đơn giản là lấy 4 dịch vụ đầu tiên
 
-            return View();
+                // Truyền dữ liệu vào View
+                ViewData["LatestNews"] = latestNews;
+                ViewData["FeaturedServices"] = featuredServices;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy dữ liệu cho trang chủ.");
+                return View("Error"); // Hoặc chuyển hướng đến trang thông báo lỗi
+            }
         }
 
         public IActionResult Privacy()
@@ -37,7 +52,7 @@ namespace WebBarberShopBooking.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
