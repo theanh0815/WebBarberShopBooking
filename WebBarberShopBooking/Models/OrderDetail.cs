@@ -19,10 +19,6 @@ namespace WebBarberShopBooking.Models
         [ForeignKey("ServiceId")]
         public Service? Service { get; set; }
 
-        public int? ProductId { get; set; }
-
-        [ForeignKey("ProductId")]
-        public Product? Product { get; set; }
 
         [Required(ErrorMessage = "Số lượng là bắt buộc.")]
         [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0.")]
