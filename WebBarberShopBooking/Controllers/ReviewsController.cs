@@ -24,7 +24,7 @@ namespace WebBarberShopBooking.Controllers
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service).Include(r => r.Product);
+            var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -39,7 +39,6 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                .Include(r => r.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
@@ -76,10 +75,6 @@ namespace WebBarberShopBooking.Controllers
                 if (review.ServiceId.HasValue)
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
-                }
-                else if (review.ProductId.HasValue)
-                {
-                    return RedirectToAction("Details", "Products", new { id = review.ProductId });
                 }
                 else
                 {
@@ -156,10 +151,6 @@ namespace WebBarberShopBooking.Controllers
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
                 }
-                else if (review.ProductId.HasValue)
-                {
-                    return RedirectToAction("Details", "Products", new { id = review.ProductId });
-                }
                 else
                 {
                     return RedirectToAction("Index", "Home");
@@ -180,7 +171,6 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                .Include(r => r.Product)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
@@ -213,10 +203,6 @@ namespace WebBarberShopBooking.Controllers
             if (review.ServiceId.HasValue)
             {
                 return RedirectToAction("Details", "Services", new { id = review.ServiceId });
-            }
-            else if (review.ProductId.HasValue)
-            {
-                return RedirectToAction("Details", "Products", new { id = review.ProductId });
             }
             else
             {

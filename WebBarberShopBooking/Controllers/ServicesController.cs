@@ -19,6 +19,7 @@ namespace WebBarberShopBooking.Controllers
         }
 
         // GET: Service/Index
+        [Route("/Services")]
         public async Task<IActionResult> Index()
         {
             try
@@ -67,8 +68,9 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Service/Create
         [Authorize(Roles = "Admin")]
-        public IActionResult Create()
-        {
+        public IActionResult Create(int id)
+        {   
+
             return View();
         }
 
