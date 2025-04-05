@@ -1,0 +1,17 @@
+﻿@* Views/Home/_LatestNews.cshtml *@
+    @model IEnumerable<WebBarberShopBooking.Models.News>
+
+    <div class="row">
+    @foreach (var news in Model)
+    {
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">@news.Title</h5>
+                            <p class="card-text">@news.Content</p>
+                            <a asp-controller="News" asp-action="Details" asp-route-id="@news.Id" class="btn btn-primary">Đọc thêm</a>
+                        </div>
+                    </div>
+                </div>
+    }
+    </div>

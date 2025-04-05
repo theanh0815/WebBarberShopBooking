@@ -1,8 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* Views/Home/Index.cshtml *@
+@{
+    ViewData["Title"] = "Trang chủ";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Chào mừng đến với Salon Tóc của chúng tôi</h1>
+    <p>Đây là trang web đặt lịch cắt tóc trực tuyến.</p>
 </div>
+
+@* Hiển thị dịch vụ nổi bật *@
+<h2>Dịch vụ nổi bật</h2>
+<partial name="_FeaturedServices" model="ViewBag.FeaturedServices" />
+
+@* Hiển thị sản phẩm mới *@
+<h2>Sản phẩm mới</h2>
+<partial name="_NewProducts" model="ViewBag.NewProducts" />
+
+@* Hiển thị tin tức mới nhất *@
+<h2>Tin tức mới nhất</h2>
+<partial name="_LatestNews" model="ViewBag.LatestNews" />

@@ -1,0 +1,17 @@
+﻿@* Views/Home/_FeaturedServices.cshtml *@
+    @model IEnumerable<WebBarberShopBooking.Models.Service>
+
+<div class="row">
+    @foreach (var service in Model)
+    {
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@service.Name</h5>
+                    <p class="card-text">@service.Description</p>
+                    <a asp-controller="Services" asp-action="Details" asp-route-id="@service.Id" class="btn btn-primary">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
