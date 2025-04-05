@@ -1,0 +1,70 @@
+﻿@model WebBarberShopBooking.Models.Order
+
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h4>Thông tin thanh toán</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Checkout">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" value="@Model.Id" />
+            <div class="form-group">
+                <label asp-for="ShippingAddress" class="control-label">Địa chỉ giao hàng</label>
+                <textarea asp-for="ShippingAddress" class="form-control"></textarea>
+                <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaymentMethod" class="control-label">Phương thức thanh toán</label>
+                <select asp-for="PaymentMethod" class="form-control" asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
+                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Đặt hàng" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-8">
+        <h5>Chi tiết đơn hàng</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sản phẩm/Dịch vụ</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Tổng cộng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>
+                            @if (item.Product != null)
+                            {
+                                @item.Product.Name
+                            }
+                            else if (item.Service != null)
+                            {
+                                @item.Service.Name
+                            }
+                        </td>
+                        <td>@item.Quantity</td>
+                        <td>@item.UnitPrice.ToString("C")</td>
+                        <td>@(item.Quantity * item.UnitPrice).ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right"><strong>Tổng tiền:</strong></td>
+                    <td>@ViewBag.TotalAmount.ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

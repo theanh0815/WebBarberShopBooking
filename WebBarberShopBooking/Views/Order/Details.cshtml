@@ -1,0 +1,80 @@
+﻿@model WebBarberShopBooking.Models.Order
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <h4>Đơn hàng #@Model.Id</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Ngày đặt hàng
+        </dt>
+        <dd class="col-sm-10">
+            @Model.OrderDate
+        </dd>
+        <dt class="col-sm-2">
+            Tổng tiền
+        </dt>
+        <dd class="col-sm-10">
+            @Model.TotalAmount.ToString("C")
+        </dd>
+        <dt class="col-sm-2">
+            Trạng thái
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Status
+        </dd>
+        <dt class="col-sm-2">
+            Phương thức thanh toán
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PaymentMethod
+        </dd>
+        <dt class="col-sm-2">
+            Địa chỉ giao hàng
+        </dt>
+        <dd class="col-sm-10">
+            @Model.ShippingAddress
+        </dd>
+    </dl>
+</div>
+
+<h5>Chi tiết sản phẩm/dịch vụ</h5>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Sản phẩm/Dịch vụ</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+            <th>Tổng cộng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderDetails)
+        {
+            <tr>
+                <td>
+                    @if (item.Product != null)
+                    {
+                        @item.Product.Name
+                    }
+                    else if (item.Service != null)
+                    {
+                        @item.Service.Name
+                    }
+                </td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitPrice.ToString("C")</td>
+                <td>@(item.Quantity * item.UnitPrice).ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="History">Quay lại lịch sử đơn hàng</a>
+</div>

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using WebBarberShopBooking.Models;
+using System.Threading.Tasks;
+using WebBarberShopBooking.ViewModels; // Tạo các ViewModels để truyền dữ liệu
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebBarberShopBooking.Controllers
 {
@@ -10,11 +12,13 @@ namespace WebBarberShopBooking.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
         }
 
         // GET: /Account/Register
@@ -34,7 +38,8 @@ namespace WebBarberShopBooking.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await _signInManager.SignInAsync(user, isPersistent: false); // Đăng nhập ngay sau khi đăng ký
+                    _logger.LogInformation($"User {user.Email} registered successfully.");
                     return RedirectToAction("Index", "Home");
                 }
                 foreach (var error in result.Errors)
@@ -63,11 +68,17 @@ namespace WebBarberShopBooking.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl);
+                    _logger.LogInformation($"User {model.Email} logged in.");
+                    if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                    return Redirect(returnUrl);
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Đăng nhập không thành công.");
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
                 }
             }
             return View(model);
@@ -79,55 +90,69 @@ namespace WebBarberShopBooking.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
             return RedirectToAction("Index", "Home");
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        // GET: /Account/Profile
+        [Authorize]
+        public async Task<IActionResult> Profile()
         {
-            if (Url.IsLocalUrl(returnUrl))
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
-                return Redirect(returnUrl);
+                return NotFound();
             }
-            else
+
+            var model = new ProfileViewModel
             {
-                return RedirectToAction("Index", "Home");
-            }
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address
+            };
+
+            return View(model);
         }
-    }
 
-    public class RegisterViewModel
-    {
-        [Required(ErrorMessage = "Email là bắt buộc.")]
-        [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
-        public string Email { get; set; }
+        // POST: /Account/Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc.")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PhoneNumber = model.PhoneNumber;
+                user.Address = model.Address;
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Xác nhận mật khẩu")]
-        [Compare("Password", ErrorMessage = "Mật khẩu và xác nhận mật khẩu không khớp.")]
-        public string ConfirmPassword { get; set; }
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Profile updated successfully.";
+                    return RedirectToAction("Profile");
+                }
 
-        [Required(ErrorMessage = "Họ là bắt buộc.")]
-        public string FirstName { get; set; }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+            return View(model);
+        }
 
-        [Required(ErrorMessage = "Tên là bắt buộc.")]
-        public string LastName { get; set; }
-    }
-
-    public class LoginViewModel
-    {
-        [Required(ErrorMessage = "Email là bắt buộc.")]
-        [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
-        public string Email { get; set; }
-
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc.")]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Display(Name = "Nhớ tôi")]
-        public bool RememberMe { get; set; }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

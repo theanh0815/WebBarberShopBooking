@@ -3,49 +3,74 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<div class="text-center my-5">
-    <h1 class="display-4 fw-bold">Chào mừng đến với Salon Tóc của chúng tôi</h1>
-    <p class="lead">Đây là trang web đặt lịch cắt tóc trực tuyến.</p>
-</div>
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Chào mừng đến với Salon Tóc của chúng tôi</h1>
+        <p class="lead text-muted">Đây là trang web đặt lịch cắt tóc trực tuyến.</p>
+    </div>
 
-<hr />
+    <hr class="my-4">
 
-@* Dịch vụ nổi bật *@
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">
-        <a href="/Services" class="text-decoration-none text-dark">Dịch vụ nổi bật</a>
-    </h2>
-    <a href="/Services" class="btn btn-outline-primary">Xem tất cả dịch vụ</a>
-</div>
+    @* Dịch vụ nổi bật *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0 fw-semibold">
+            <a href="/Services" class="text-decoration-none text-dark">Dịch vụ nổi bật</a>
+        </h2>
+        <a href="/Services" class="btn btn-outline-primary btn-sm">Xem tất cả dịch vụ</a>
+    </div>
 
-<div class="row">
-    @foreach (var service in ViewBag.FeaturedServices)
-    {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0 hover-shadow transition">
-                <img src="@service.ImageUrl" class="card-img-top" alt="@service.Name" style="object-fit: cover; height: 200px;">
-                <div class="card-body">
-                    <h5 class="card-title fw-semibold">@service.Name</h5>
-                    <p class="card-text text-muted">@service.Description</p>
-                    <p class="card-text"><strong>Giá:</strong> @service.Price.ToString("N0") VNĐ</p>
+    <div class="row">
+        @if (ViewBag.FeaturedServices != null)
+        {
+            @foreach (var service in ViewBag.FeaturedServices)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0 hover-shadow transition">
+                        <img src="@service.ImageUrl" class="card-img-top" alt="@service.Name" style="object-fit: cover; height: 200px;">
+                        <div class="card-body">
+                            <h5 class="card-title fw-semibold mb-2">@service.Name</h5>
+                            <p class="card-text text-muted">@service.Description</p>
+                            <p class="card-text small"><strong>Giá:</strong> @service.Price.ToString("N0") VNĐ</p>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
+                            <a href="/Services/Details/@service.Id" class="btn btn-sm btn-primary">Chi tiết</a>
+                            <a href="/Booking/Create?serviceId=@service.Id" class="btn btn-sm btn-success">Đặt lịch</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-footer bg-white border-0 d-flex justify-content-between">
-                    <a href="/Services/Details/@service.Id" class="btn btn-sm btn-primary">Xem chi tiết</a>
-                    <a href="/Booking/Create?serviceId=@service.Id" class="btn btn-sm btn-success">Đặt lịch</a>
-                </div>
+            }
+        }
+        else
+        {
+            <div class="col">
+                <p class="text-muted">Hiện chưa có dịch vụ nổi bật nào.</p>
             </div>
-        </div>
+        }
+    </div>
+
+    <hr class="my-4">
+
+    @* Sản phẩm mới *@
+    <h2 class="mt-5 mb-4 fw-semibold">Sản phẩm mới</h2>
+    @if (ViewBag.NewProduct != null)
+    {
+        <partial name="_NewProduct" model="ViewBag.NewProduct" />
+    }
+    else
+    {
+        <p class="text-muted">Hiện chưa có sản phẩm mới nào.</p>
+    }
+
+    <hr class="my-4">
+
+    @* Tin tức mới nhất *@
+    <h2 class="mt-5 mb-4 fw-semibold">Tin tức mới nhất</h2>
+    @if (ViewBag.LatestNews != null)
+    {
+        <partial name="_LatestNews" model="ViewBag.LatestNews" />
+    }
+    else
+    {
+        <p class="text-muted">Hiện chưa có tin tức mới nào.</p>
     }
 </div>
-
-<hr />
-
-@* Sản phẩm mới *@
-<h2 class="mt-5">Sản phẩm mới</h2>
-<partial name="_NewProducts" model="ViewBag.NewProducts" />
-
-<hr />
-
-@* Tin tức mới nhất *@
-<h2 class="mt-5">Tin tức mới nhất</h2>
-<partial name="_LatestNews" model="ViewBag.LatestNews" />

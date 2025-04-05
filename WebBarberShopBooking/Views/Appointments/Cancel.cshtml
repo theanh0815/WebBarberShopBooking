@@ -1,17 +1,17 @@
 ﻿@model WebBarberShopBooking.Models.Appointment
 
 @{
-    ViewData["Title"] = "Chi tiết lịch hẹn";
+    ViewData["Title"] = "Hủy lịch hẹn";
 }
 
 <h1>@ViewData["Title"]</h1>
 
+<h3>Bạn có chắc chắn muốn hủy lịch hẹn này?</h3>
 <div>
     <h4>Appointment</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            Dịch vụ
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Service.Name)
@@ -34,14 +34,11 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Status)
         </dd>
-        <dt class="col-sm-2">
-            Ghi chú
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Notes)
-        </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="History">Quay lại lịch sử</a>
+
+    <form asp-action="Cancel" asp-route-id="@Model.Id">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xác nhận hủy" class="btn btn-danger" /> |
+        <a asp-action="History">Quay lại lịch sử</a>
+    </form>
 </div>

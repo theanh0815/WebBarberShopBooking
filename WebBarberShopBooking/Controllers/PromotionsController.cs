@@ -1,29 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using WebBarberShopBooking.Models;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // For [Authorize]
+using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
-    public class PromotionsController : Controller
+    public class PromotionController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<PromotionController> _logger;
 
-        public PromotionsController(ApplicationDbContext context)
+        public PromotionController(ApplicationDbContext context, ILogger<PromotionController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // GET: Promotions
+        // GET: Promotion/Index (Hiển thị danh sách khuyến mãi)
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Promotions.Where(p => p.IsActive).ToListAsync());
+            try
+            {
+                var promotions = await _context.Promotions.ToListAsync();
+                return View(promotions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách khuyến mãi.");
+                return View("Error");
+            }
         }
 
-        // GET: Promotions/Details/5
+        // GET: Promotion/Details/5 (Xem chi tiết khuyến mãi)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -31,27 +41,33 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var promotion = await _context.Promotions
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (promotion == null)
+            try
             {
-                return NotFound();
+                var promotion = await _context.Promotions.FirstOrDefaultAsync(m => m.Id == id);
+                if (promotion == null)
+                {
+                    return NotFound();
+                }
+                return View(promotion);
             }
-
-            return View(promotion);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xem chi tiết khuyến mãi.");
+                return View("Error");
+            }
         }
 
-        // GET: Promotions/Create
+        // GET: Promotion/Create (Thêm khuyến mãi - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Promotions/Create
-        [Authorize(Roles = "Admin")]
+        // POST: Promotion/Create (Xử lý thêm khuyến mãi - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Title,Description,StartDate,EndDate,DiscountPercentage,DiscountAmount")] Promotion promotion)
         {
             if (ModelState.IsValid)
@@ -63,7 +79,7 @@ namespace WebBarberShopBooking.Controllers
             return View(promotion);
         }
 
-        // GET: Promotions/Edit/5
+        // GET: Promotion/Edit/5 (Sửa khuyến mãi - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -80,10 +96,10 @@ namespace WebBarberShopBooking.Controllers
             return View(promotion);
         }
 
-        // POST: Promotions/Edit/5
-        [Authorize(Roles = "Admin")]
+        // POST: Promotion/Edit/5 (Xử lý sửa khuyến mãi - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,StartDate,EndDate,DiscountPercentage,DiscountAmount")] Promotion promotion)
         {
             if (id != promotion.Id)
@@ -114,7 +130,7 @@ namespace WebBarberShopBooking.Controllers
             return View(promotion);
         }
 
-        // GET: Promotions/Delete/5
+        // GET: Promotion/Delete/5 (Xóa khuyến mãi - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -123,8 +139,7 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var promotion = await _context.Promotions
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var promotion = await _context.Promotions.FirstOrDefaultAsync(m => m.Id == id);
             if (promotion == null)
             {
                 return NotFound();
@@ -133,11 +148,11 @@ namespace WebBarberShopBooking.Controllers
             return View(promotion);
         }
 
-        // POST: Promotions/Delete/5
-        [Authorize(Roles = "Admin")]
+        // POST: Promotion/Delete/5 (Xử lý xóa khuyến mãi - Chỉ Admin)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
             var promotion = await _context.Promotions.FindAsync(id);
             _context.Promotions.Remove(promotion);
