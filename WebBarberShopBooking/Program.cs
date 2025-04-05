@@ -20,6 +20,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddRazorPages();
+
 var app = builder.Build();
 
 // Cấu hình HTTP request pipeline.

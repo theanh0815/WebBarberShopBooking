@@ -12,7 +12,7 @@ using WebBarberShopBooking.Models;
 namespace WebBarberShopBooking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250404103203_InitialCreate")]
+    [Migration("20250405135535_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -223,7 +223,8 @@ namespace WebBarberShopBooking.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Caption")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
