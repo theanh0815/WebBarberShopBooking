@@ -1,0 +1,72 @@
+﻿@model IEnumerable<WebBarberShopBooking.Models.OrderDetail>
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Any())
+{
+    <form asp-action="UpdateCart">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sản phẩm/Dịch vụ</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Tổng cộng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (item.Product != null)
+                            {
+                                @item.Product.Name
+                            }
+                            else if (item.Service != null)
+                            {
+                                @item.Service.Name
+                            }
+                        </td>
+                        <td>
+                            @item.UnitPrice.ToString("C")
+                        </td>
+                        <td>
+                            <input type="hidden" name="orderDetailId" value="@item.Id" />
+                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control" style="width: 80px;" />
+                        </td>
+                        <td>
+                            @(item.Quantity * item.UnitPrice).ToString("C")
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
+                            <a asp-action="RemoveFromCart" asp-route-orderDetailId="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-right">
+                        <strong>Tổng tiền:</strong>
+                    </td>
+                    <td>
+                        @Model.Sum(item => item.Quantity * item.UnitPrice).ToString("C")
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+
+    <a asp-action="Checkout" class="btn btn-success">Tiến hành thanh toán</a>
+}
+else
+{
+    <p>Giỏ hàng của bạn đang trống.</p>
+}

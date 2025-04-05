@@ -1,30 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using WebBarberShopBooking.Models;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // For [Authorize]
+using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
-    [Authorize(Roles = "Admin")] // Chỉ Admin mới có quyền truy cập
-    public class StylistsController : Controller
+    public class StylistController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<StylistController> _logger;
 
-        public StylistsController(ApplicationDbContext context)
+        public StylistController(ApplicationDbContext context, ILogger<StylistController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // GET: Stylists
+        // GET: Stylist/Index (Hiển thị danh sách thợ)
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Stylists.ToListAsync());
+            try
+            {
+                var stylists = await _context.Stylists.ToListAsync();
+                return View(stylists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách thợ.");
+                return View("Error");
+            }
         }
 
-        // GET: Stylists/Details/5
+        // GET: Stylist/Details/5 (Xem chi tiết thợ)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -32,25 +41,33 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var stylist = await _context.Stylists
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (stylist == null)
+            try
             {
-                return NotFound();
+                var stylist = await _context.Stylists.FirstOrDefaultAsync(m => m.Id == id);
+                if (stylist == null)
+                {
+                    return NotFound();
+                }
+                return View(stylist);
             }
-
-            return View(stylist);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xem chi tiết thợ.");
+                return View("Error");
+            }
         }
 
-        // GET: Stylists/Create
+        // GET: Stylist/Create (Thêm thợ - Chỉ Admin)
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Stylists/Create
+        // POST: Stylist/Create (Xử lý thêm thợ - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Bio,ImageUrl")] Stylist stylist)
         {
             if (ModelState.IsValid)
@@ -62,7 +79,8 @@ namespace WebBarberShopBooking.Controllers
             return View(stylist);
         }
 
-        // GET: Stylists/Edit/5
+        // GET: Stylist/Edit/5 (Sửa thợ - Chỉ Admin)
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,9 +96,10 @@ namespace WebBarberShopBooking.Controllers
             return View(stylist);
         }
 
-        // POST: Stylists/Edit/5
+        // POST: Stylist/Edit/5 (Xử lý sửa thợ - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Bio,ImageUrl")] Stylist stylist)
         {
             if (id != stylist.Id)
@@ -111,7 +130,8 @@ namespace WebBarberShopBooking.Controllers
             return View(stylist);
         }
 
-        // GET: Stylists/Delete/5
+        // GET: Stylist/Delete/5 (Xóa thợ - Chỉ Admin)
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -119,8 +139,7 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var stylist = await _context.Stylists
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var stylist = await _context.Stylists.FirstOrDefaultAsync(m => m.Id == id);
             if (stylist == null)
             {
                 return NotFound();
@@ -129,10 +148,11 @@ namespace WebBarberShopBooking.Controllers
             return View(stylist);
         }
 
-        // POST: Stylists/Delete/5
+        // POST: Stylist/Delete/5 (Xử lý xóa thợ - Chỉ Admin)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
             var stylist = await _context.Stylists.FindAsync(id);
             _context.Stylists.Remove(stylist);

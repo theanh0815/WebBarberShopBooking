@@ -1,29 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using WebBarberShopBooking.Models;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // For [Authorize]
+using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
     public class NewsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<NewsController> _logger;
 
-        public NewsController(ApplicationDbContext context)
+        public NewsController(ApplicationDbContext context, ILogger<NewsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        // GET: News
+        // GET: News/Index (Hiển thị danh sách tin tức)
         public async Task<IActionResult> Index()
         {
-            return View(await _context.News.OrderByDescending(n => n.PublishDate).ToListAsync());
+            try
+            {
+                var news = await _context.News.ToListAsync();
+                return View(news);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy danh sách tin tức.");
+                return View("Error");
+            }
         }
 
-        // GET: News/Details/5
+        // GET: News/Details/5 (Xem chi tiết tin tức)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -31,28 +41,34 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var news = await _context.News
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (news == null)
+            try
             {
-                return NotFound();
+                var news = await _context.News.FirstOrDefaultAsync(m => m.Id == id);
+                if (news == null)
+                {
+                    return NotFound();
+                }
+                return View(news);
             }
-
-            return View(news);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xem chi tiết tin tức.");
+                return View("Error");
+            }
         }
 
-        // GET: News/Create
+        // GET: News/Create (Thêm tin tức - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: News/Create
-        [Authorize(Roles = "Admin")]
+        // POST: News/Create (Xử lý thêm tin tức - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,PublishDate,ImageUrl")] News news)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("Id,Title,Content,ImageUrl,PublishDate")] News news)
         {
             if (ModelState.IsValid)
             {
@@ -63,7 +79,7 @@ namespace WebBarberShopBooking.Controllers
             return View(news);
         }
 
-        // GET: News/Edit/5
+        // GET: News/Edit/5 (Sửa tin tức - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -80,11 +96,11 @@ namespace WebBarberShopBooking.Controllers
             return View(news);
         }
 
-        // POST: News/Edit/5
-        [Authorize(Roles = "Admin")]
+        // POST: News/Edit/5 (Xử lý sửa tin tức - Chỉ Admin)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,PublishDate,ImageUrl")] News news)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Content,ImageUrl,PublishDate")] News news)
         {
             if (id != news.Id)
             {
@@ -114,7 +130,7 @@ namespace WebBarberShopBooking.Controllers
             return View(news);
         }
 
-        // GET: News/Delete/5
+        // GET: News/Delete/5 (Xóa tin tức - Chỉ Admin)
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -123,8 +139,7 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var news = await _context.News
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var news = await _context.News.FirstOrDefaultAsync(m => m.Id == id);
             if (news == null)
             {
                 return NotFound();
@@ -133,11 +148,11 @@ namespace WebBarberShopBooking.Controllers
             return View(news);
         }
 
-        // POST: News/Delete/5
-        [Authorize(Roles = "Admin")]
+        // POST: News/Delete/5 (Xử lý xóa tin tức - Chỉ Admin)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
             var news = await _context.News.FindAsync(id);
             _context.News.Remove(news);

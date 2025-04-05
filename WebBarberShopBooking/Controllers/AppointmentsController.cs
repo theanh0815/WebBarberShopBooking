@@ -1,36 +1,108 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList
 using Microsoft.EntityFrameworkCore;
+using WebBarberShopBooking.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization; // For [Authorize]
 using Microsoft.AspNetCore.Identity;
-using WebBarberShopBooking.Models;
+using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
-    public class AppointmentsController : Controller
+    [Authorize] // Yêu cầu người dùng đăng nhập để sử dụng
+    public class AppointmentController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<AppointmentController> _logger;
 
-        public AppointmentsController(ApplicationDbContext context, UserManager<User> userManager)
+        public AppointmentController(ApplicationDbContext context, UserManager<User> userManager, ILogger<AppointmentController> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
-        // GET: Appointments
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
+        // GET: Appointment/Index (Hiển thị form đặt lịch)
+        public async Task<IActionResult> Index(int? serviceId)
         {
-            var applicationDbContext = _context.Appointments.Include(a => a.Service).Include(a => a.User).Include(a => a.Stylist);
-            return View(await applicationDbContext.ToListAsync());
+            try
+            {
+                // Lấy danh sách dịch vụ và thợ để hiển thị trong dropdown
+                ViewData["ServiceId"] = new SelectList(await _context.Services.ToListAsync(), "Id", "Name", serviceId);
+                ViewData["StylistId"] = new SelectList(await _context.Stylists.ToListAsync(), "Id", "Name");
+
+                // Truyền serviceId (nếu có) để chọn sẵn dịch vụ
+                ViewBag.SelectedServiceId = serviceId;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi hiển thị form đặt lịch.");
+                return View("Error");
+            }
         }
 
-        // GET: Appointments/Details/5
-        [Authorize]
+        // POST: Appointment/Create (Xử lý đặt lịch)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,DateTime,ServiceId,StylistId,Notes")] Appointment appointment)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Lấy thông tin người dùng hiện tại
+                    var user = await _userManager.GetUserAsync(User);
+                    appointment.UserId = user.Id;
+                    appointment.Status = AppointmentStatus.Pending; // Mặc định là Pending
+
+                    _context.Add(appointment);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Đặt lịch thành công!"; // Thông báo thành công
+                    return RedirectToAction(nameof(History)); // Chuyển đến trang lịch sử
+                }
+
+                // Nếu ModelState không hợp lệ, trả về form với lỗi
+                ViewData["ServiceId"] = new SelectList(await _context.Services.ToListAsync(), "Id", "Name", appointment.ServiceId);
+                ViewData["StylistId"] = new SelectList(await _context.Stylists.ToListAsync(), "Id", "Name", appointment.StylistId);
+                return View("Index", appointment);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi đặt lịch.");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra. Vui lòng thử lại.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // GET: Appointment/History (Xem lịch sử đặt lịch)
+        public async Task<IActionResult> History()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var appointments = await _context.Appointments
+                    .Include(a => a.Service)
+                    .Include(a => a.Stylist)
+                    .Where(a => a.UserId == user.Id)
+                    .OrderByDescending(a => a.DateTime)
+                    .ToListAsync();
+
+                return View(appointments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xem lịch sử đặt lịch.");
+                return View("Error");
+            }
+        }
+
+        // GET: Appointment/Details/5 (Xem chi tiết lịch hẹn)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,10 +111,11 @@ namespace WebBarberShopBooking.Controllers
             }
 
             var appointment = await _context.Appointments
-                .Include(a => a.Service)
                 .Include(a => a.User)
+                .Include(a => a.Service)
                 .Include(a => a.Stylist)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (appointment == null)
             {
                 return NotFound();
@@ -51,94 +124,8 @@ namespace WebBarberShopBooking.Controllers
             return View(appointment);
         }
 
-        // GET: Appointments/Create
-        [Authorize]
-        public IActionResult Create()
-        {
-            ViewData["ServiceId"] = _context.Services.ToList();
-            ViewData["StylistId"] = _context.Stylists.ToList();
-            return View();
-        }
-
-        // POST: Appointments/Create
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,DateTime,ServiceId,StylistId,Notes")] Appointment appointment)
-        {
-            if (ModelState.IsValid)
-            {
-                // Lấy thông tin người dùng hiện tại
-                var user = await _userManager.GetUserAsync(User);
-                appointment.UserId = user.Id;
-
-                _context.Add(appointment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Home"); // Hoặc trang xác nhận
-            }
-            ViewData["ServiceId"] = _context.Services.ToList();
-            ViewData["StylistId"] = _context.Stylists.ToList();
-            return View(appointment);
-        }
-
-        // GET: Appointments/Edit/5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment == null)
-            {
-                return NotFound();
-            }
-            ViewData["ServiceId"] = _context.Services.ToList();
-            ViewData["StylistId"] = _context.Stylists.ToList();
-            return View(appointment);
-        }
-
-        // POST: Appointments/Edit/5
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DateTime,ServiceId,StylistId,UserId,Notes,Status")] Appointment appointment)
-        {
-            if (id != appointment.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(appointment);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AppointmentExists(appointment.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ServiceId"] = _context.Services.ToList();
-            ViewData["StylistId"] = _context.Stylists.ToList();
-            return View(appointment);
-        }
-
-        // GET: Appointments/Delete/5
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Appointment/Cancel/5 (Hiển thị xác nhận hủy lịch)
+        public async Task<IActionResult> Cancel(int? id)
         {
             if (id == null)
             {
@@ -147,8 +134,9 @@ namespace WebBarberShopBooking.Controllers
 
             var appointment = await _context.Appointments
                 .Include(a => a.Service)
-                .Include(a => a.User)
+                .Include(a => a.Stylist)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (appointment == null)
             {
                 return NotFound();
@@ -157,62 +145,30 @@ namespace WebBarberShopBooking.Controllers
             return View(appointment);
         }
 
-        // POST: Appointments/Delete/5
-        [Authorize(Roles = "Admin")]
-        [HttpPost, ActionName("Delete")]
+        // POST: Appointment/Cancel/5 (Xử lý hủy lịch)
+        [HttpPost, ActionName("Cancel")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> CancelConfirmed(int? id)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
-            _context.Appointments.Remove(appointment);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool AppointmentExists(int id)
-        {
-            return _context.Appointments.Any(e => e.Id == id);
-        }
-
-        // GET: Appointments/UserAppointments
-        [Authorize]
-        public async Task<IActionResult> UserAppointments()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var appointments = await _context.Appointments
-                .Where(a => a.UserId == user.Id)
-                .Include(a => a.Service)
-                .Include(a => a.Stylist)
-                .ToListAsync();
-
-            return View(appointments);
-        }
-
-        // GET: Appointments/Cancel/5
-        [Authorize]
-        public async Task<IActionResult> Cancel(int? id)
-        {
-            if (id == null)
+            try
             {
+                var appointment = await _context.Appointments.FindAsync(id);
+                if (appointment != null)
+                {
+                    appointment.Status = AppointmentStatus.Cancelled;
+                    _context.Update(appointment);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Hủy lịch thành công!";
+                    return RedirectToAction(nameof(History));
+                }
                 return NotFound();
             }
-
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                _logger.LogError(ex, "Lỗi khi hủy lịch.");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi hủy lịch. Vui lòng thử lại.";
+                return RedirectToAction(nameof(History));
             }
-
-            if (appointment.UserId != _userManager.GetUserId(User))
-            {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
-            }
-
-            appointment.Status = AppointmentStatus.Cancelled;
-            _context.Update(appointment);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(UserAppointments));
         }
     }
 }
