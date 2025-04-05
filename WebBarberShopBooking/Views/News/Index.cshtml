@@ -1,0 +1,36 @@
+﻿@model IEnumerable<WebBarberShopBooking.Models.News>
+
+@{
+    ViewData["Title"] = "Danh sách tin tức";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">Thêm tin tức</a>
+    </p>
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Title">
+                <div class="card-body">
+                    <h5 class="card-title">@item.Title</h5>
+                    <p class="card-text">@item.Content.Substring(0, Math.Min(100, item.Content.Length))...</p>
+                    <p class="card-text"><small class="text-muted">@item.PublishDate.ToString("dd/MM/yyyy")</small></p>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">Xem thêm</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

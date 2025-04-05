@@ -1,14 +1,14 @@
-﻿@model WebBarberShopBooking.Models.Service
+﻿@model WebBarberShopBooking.Models.Product
 
 @{
-    ViewData["Title"] = "Xóa dịch vụ";
+    ViewData["Title"] = "Xóa sản phẩm";
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<h3>Bạn có chắc chắn muốn xóa dịch vụ này?</h3>
+<h3>Bạn có chắc chắn muốn xóa sản phẩm này?</h3>
 <div>
-    <h4>Service</h4>
+    <h4>Product</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -27,13 +27,19 @@
             @Html.DisplayNameFor(model => model.Price)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Price)
+            @Model.Price.ToString("C")
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ImageUrl)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
+            <img src="@Model.ImageUrl" alt="@Model.Name" width="200" />
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Category.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Category.Name)
         </dd>
     </dl>
 

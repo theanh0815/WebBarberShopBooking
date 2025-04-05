@@ -1,65 +1,65 @@
-﻿@model IEnumerable<WebBarberShopBooking.Models.Appointment>
+﻿@model WebBarberShopBooking.Models.Appointment
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Đặt lịch hẹn";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Service)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stylist)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Service.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stylist.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="ServiceId" class="control-label">Dịch vụ</label>
+                <select asp-for="ServiceId" class="form-control" asp-items="ViewBag.ServiceId"></select>
+                <span asp-validation-for="ServiceId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StylistId" class="control-label">Thợ cắt tóc (tùy chọn)</label>
+                <select asp-for="StylistId" class="form-control" asp-items="ViewBag.StylistId">
+                    <option value="">-- Chọn thợ (tùy chọn) --</option>
+                </select>
+                <span asp-validation-for="StylistId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DateTime" class="control-label">Ngày giờ hẹn</label>
+                <input asp-for="DateTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="DateTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Notes" class="control-label">Ghi chú (tùy chọn)</label>
+                <textarea asp-for="Notes" class="form-control"></textarea>
+                <span asp-validation-for="Notes" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Đặt lịch" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="History">Xem lịch sử đặt lịch</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            // Chọn sẵn dịch vụ nếu có serviceId
+            var selectedServiceId = "@ViewBag.SelectedServiceId";
+            if (selectedServiceId) {
+                $("#ServiceId").val(selectedServiceId);
+            }
+        });
+    </script>
 }
-    </tbody>
-</table>

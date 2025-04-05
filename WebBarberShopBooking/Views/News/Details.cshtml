@@ -1,0 +1,28 @@
+﻿@model WebBarberShopBooking.Models.News
+
+@{
+    ViewData["Title"] = "Chi tiết tin tức";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <h4>News</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-8">
+            <h2>@Model.Title</h2>
+            <p class="text-muted">Ngày xuất bản: @Model.PublishDate.ToString("dd/MM/yyyy HH:mm")</p>
+            <img src="@Model.ImageUrl" class="img-fluid mb-3" alt="@Model.Title">
+            <p>@Model.Content</p>
+        </div>
+    </div>
+</div>
+<div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Sửa</a>
+        <a asp-action = "Delete" asp - route - id = "@Model.Id" class="btn btn-sm btn-danger">Xóa</a>
+    }
+    <a asp-action="Index">Quay lại danh sách</a>
+</div>
