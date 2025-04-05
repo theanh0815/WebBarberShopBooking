@@ -1,42 +1,49 @@
-﻿@model WebBarberShopBooking.ViewModels.RegisterViewModel
+﻿@* Views/Account/Register.cshtml *@
+@model WebBarberShopBooking.ViewModels.RegisterViewModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+<div class="row justify-content-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h2 class="mb-0">@ViewData["Title"]</h2>
             </div>
-            <div class="form-group">
-                <label asp-for="FirstName"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+            <div class="card-body p-4">
+                <form asp-action="Register" method="post">
+                    <partial name="_AccountForm" model="Model" />
+                    
+                    <div class="form-group form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="acceptTerms" required />
+                        <label class="form-check-label" for="acceptTerms">
+                            Tôi đồng ý với <a href="#" class="text-decoration-none">điều khoản sử dụng</a>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group d-grid mb-3">
+                        <button type="submit" class="btn btn-primary py-2">
+                            <i class="fas fa-user-plus me-2"></i>Đăng ký
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4" />
+                
+                <div class="text-center">
+                    <p>Hoặc đăng ký với</p>
+                    <div class="d-flex justify-content-center gap-3 mb-3">
+                        <a href="#" class="btn btn-outline-primary"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-danger"><i class="fab fa-google"></i></a>
+                    </div>
+                    <p class="mb-0">
+                        Bạn đã có tài khoản? 
+                        <a asp-action="Login" class="text-decoration-none fw-bold">Đăng nhập</a>
+                    </p>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="LastName"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -44,4 +51,40 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Add password strength meter
+        $(document).ready(function() {
+            $('input[type=password]').keyup(function() {
+                var password = $(this).val();
+                var strength = 0;
+                
+                if (password.length > 7) strength += 1;
+                if (password.match(/[a-z]+/)) strength += 1;
+                if (password.match(/[A-Z]+/)) strength += 1;
+                if (password.match(/[0-9]+/)) strength += 1;
+                if (password.match(/[$#&!]+/)) strength += 1;
+                
+                var strengthBar = $('.password-strength');
+                
+                switch(strength) {
+                    case 0:
+                    case 1:
+                        strengthBar.css('width', '20%').removeClass().addClass('progress-bar bg-danger password-strength');
+                        break;
+                    case 2:
+                        strengthBar.css('width', '40%').removeClass().addClass('progress-bar bg-warning password-strength');
+                        break;
+                    case 3:
+                        strengthBar.css('width', '60%').removeClass().addClass('progress-bar bg-info password-strength');
+                        break;
+                    case 4:
+                        strengthBar.css('width', '80%').removeClass().addClass('progress-bar bg-primary password-strength');
+                        break;
+                    case 5:
+                        strengthBar.css('width', '100%').removeClass().addClass('progress-bar bg-success password-strength');
+                        break;
+                }
+            });
+        });
+    </script>
 }
