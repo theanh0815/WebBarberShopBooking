@@ -155,6 +155,9 @@ namespace WebBarberShopBooking.Controllers
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
             var promotion = await _context.Promotions.FindAsync(id);
+            if (promotion == null) {
+                return NotFound();
+            }
             _context.Promotions.Remove(promotion);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
