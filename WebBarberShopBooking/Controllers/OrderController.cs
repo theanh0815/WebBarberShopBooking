@@ -100,7 +100,7 @@ namespace WebBarberShopBooking.Controllers
                 }
                 else
                 {
-                    var service = await _context.Services.FindAsync(serviceId);
+                    var service1 = await _context.Services.FindAsync(serviceId);
                     if (service == null)
                     {
                         return NotFound();
