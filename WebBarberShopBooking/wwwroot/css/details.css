@@ -1,0 +1,149 @@
+﻿/* Service Details Page Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid #c69c6d;
+    padding-bottom: 10px;
+}
+
+h4 {
+    color: #333;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+hr {
+    border-color: #ddd;
+    margin: 20px 0;
+}
+
+/* Details list styling */
+dl.row {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+dt.col-sm-2 {
+    color: #666;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+dd.col-sm-10 {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #eee;
+}
+
+    dd.col-sm-10:last-child {
+        border-bottom: none;
+    }
+
+/* Link styling */
+a {
+    color: #c69c6d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    margin-right: 15px;
+}
+
+    a:hover {
+        color: #a67c52;
+        text-decoration: underline;
+    }
+
+/* Form styling */
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    max-width: 150px;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #c69c6d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+    .btn-primary:hover {
+        background-color: #a67c52;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    dt.col-sm-2, dd.col-sm-10 {
+        padding: 0 15px;
+    }
+}
+
+/* Special styling for price */
+dd.col-sm-10:nth-of-type(3) {
+    font-weight: bold;
+    color: #c69c6d;
+    font-size: 1.2em;
+}
+
+/* Container for action links */
+div:last-of-type {
+    margin-top: 20px;
+}
+
+/* Make the actions and form look connected */
+div:last-of-type {
+    display: flex;
+    flex-direction: column;
+}
+
+    div:last-of-type > a {
+        margin-bottom: 10px;
+        display: inline-block;
+    }
