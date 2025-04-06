@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebBarberShopBooking.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/style_salon.css" />
-    @* <link rel="stylesheet" href="~/css/form-style.css" /> *@
+    <link rel="stylesheet" href="~/css/form-style.css" />
+    <link rel="stylesheet" href="~/css/service.css" />
+    
     <style>
         :root {
             --primary-color: #1a1a2e;
@@ -132,6 +134,17 @@
                 margin-bottom: 0.8rem;
                 transition: all 0.3s ease;
             }
+            .footer p{
+                color: white;
+            }
+
+            .footer ul {
+            color: white;
+            }
+
+            .footer h5 {
+            text-align: center;
+            }
 
             .footer-links a {
                 color: var(--footer-link);
@@ -178,10 +191,8 @@
                 }
 
         /* Responsive Adjustments */
-        @media (max-width: 991px) {
-            .navbar
-
-        {
+    
+        .navbar{
             padding: 0.8rem 1rem;
         }
 
@@ -191,11 +202,9 @@
 
         }
 
-        @media (max-width: 767px) {
-            .footer
-
+       .footer
         {
-            text-align: center;
+            text-align: left;
         }
 
         .footer h5::after {
@@ -281,9 +290,9 @@
                 <div class="col-lg-4 mb-4">
                     <h5>THÔNG TIN LIÊN HỆ</h5>
                     <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Nguyễn Văn Linh, Đà Nẵng</li>
-                        <li><i class="fas fa-phone me-2"></i> +84 123 456 789</li>
-                        <li><i class="fas fa-envelope me-2"></i> info@tlapbarber.com</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Lý Thường Kiệt, Dĩ An, Bình Dương</li>
+                        <li><i class="fas fa-phone me-2"></i> +84 905 100 0 biết</li>
+                        <li><i class="fas fa-envelope me-2"></i> 3consoi@tlapbarber.com</li>
                         <li><i class="fas fa-clock me-2"></i> T2-CN: 8:00 - 20:00</li>
                     </ul>
                 </div>
