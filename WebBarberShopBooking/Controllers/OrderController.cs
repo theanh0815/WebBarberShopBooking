@@ -6,12 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization; // For [Authorize]
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace WebBarberShopBooking.Controllers
 {
-    [Authorize] // Yêu cầu người dùng đăng nhập
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,7 +25,7 @@ namespace WebBarberShopBooking.Controllers
             _logger = logger;
         }
 
-        // GET: Order/Cart (Hiển thị giỏ hàng)
+        // GET: Order/Cart (Hiển thị giỏ hàng - chỉ dịch vụ)
         public async Task<IActionResult> Cart()
         {
             try
@@ -36,7 +36,7 @@ namespace WebBarberShopBooking.Controllers
                     .Where(od => od.Order.UserId == user.Id && od.Order.Status == OrderStatus.Pending)
                     .ToListAsync();
 
-                // Kiểm tra xem có đơn hàng Pending nào không, nếu không có thì tạo mới
+                // Kiểm tra và tạo đơn hàng Pending nếu chưa có
                 var pendingOrder = await _context.Orders
                     .FirstOrDefaultAsync(o => o.UserId == user.Id && o.Status == OrderStatus.Pending);
 
@@ -58,17 +58,15 @@ namespace WebBarberShopBooking.Controllers
             }
         }
 
-        // POST: Order/AddToCart (Thêm sản phẩm vào giỏ hàng)
-        // Sửa lại phương thức AddToCart
+        // POST: Order/AddToCart (Thêm dịch vụ vào giỏ hàng)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddToCart(int serviceId, int quantity = 1)
+        public async Task<IActionResult> AddToCart(int serviceId, int quantity)
         {
             try
             {
                 var user = await _userManager.GetUserAsync(User);
                 var service = await _context.Services.FindAsync(serviceId); // Thêm dòng này để lấy service
-
                 if (service == null)
                 {
                     return NotFound();
@@ -90,7 +88,8 @@ namespace WebBarberShopBooking.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // Kiểm tra service đã có trong giỏ chưa
+                // Kiểm tra xem dịch vụ đã có trong giỏ hàng chưa
+
                 var existingItem = await _context.OrderDetails
                     .FirstOrDefaultAsync(od => od.OrderId == order.Id && od.ServiceId == serviceId);
 
@@ -101,6 +100,12 @@ namespace WebBarberShopBooking.Controllers
                 }
                 else
                 {
+                    var service = await _context.Services.FindAsync(serviceId);
+                    if (service == null)
+                    {
+                        return NotFound();
+                    }
+
                     var cartItem = new OrderDetail
                     {
                         OrderId = order.Id,
@@ -121,7 +126,7 @@ namespace WebBarberShopBooking.Controllers
             }
         }
 
-        // POST: Order/RemoveFromCart (Xóa sản phẩm khỏi giỏ hàng)
+        // POST: Order/RemoveFromCart (Xóa dịch vụ khỏi giỏ hàng)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveFromCart(int orderDetailId)
@@ -143,7 +148,7 @@ namespace WebBarberShopBooking.Controllers
             }
         }
 
-        // POST: Order/UpdateCart (Cập nhật số lượng sản phẩm trong giỏ hàng)
+        // POST: Order/UpdateCart (Cập nhật số lượng dịch vụ trong giỏ hàng)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCart(int orderDetailId, int quantity)
@@ -177,10 +182,11 @@ namespace WebBarberShopBooking.Controllers
 
                 if (order == null)
                 {
-                    return RedirectToAction(nameof(Cart)); // Nếu không có đơn hàng Pending, quay lại giỏ hàng
+                    return RedirectToAction(nameof(Cart));
                 }
 
                 var cartItems = await _context.OrderDetails
+                    .Include(od => od.Service)
                     .Where(od => od.OrderId == order.Id)
                     .ToListAsync();
 
@@ -204,7 +210,7 @@ namespace WebBarberShopBooking.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    order.Status = OrderStatus.Processing; // Chuyển trạng thái sang Processing
+                    order.Status = OrderStatus.Processing;
                     _context.Update(order);
 
                     // Tính tổng tiền
@@ -216,7 +222,7 @@ namespace WebBarberShopBooking.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    // Xử lý logic thanh toán (ví dụ: tích hợp cổng thanh toán) - **Cần triển khai**
+                    // Xử lý logic thanh toán
                     // ...
 
                     TempData["SuccessMessage"] = "Đặt hàng thành công!";

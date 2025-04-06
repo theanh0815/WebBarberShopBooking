@@ -1,0 +1,52 @@
+﻿@* Views/Admin/Dashboard/Index.cshtml *@
+@{
+    ViewData["Title"] = "Bảng điều khiển quản trị";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số người dùng</h5>
+                <p class="card-text">@ViewBag.TotalUsers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số dịch vụ</h5>
+                <p class="card-text">@ViewBag.TotalServices</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số đơn hàng</h5>
+                <p class="card-text">@ViewBag.TotalOrders</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tổng số lịch hẹn</h5>
+                <p class="card-text">@ViewBag.TotalAppointments</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tổng doanh thu</h5>
+                <p class="card-text">@ViewBag.TotalRevenue</p>
+                <a href="#" class="btn btn-sm btn-primary">Xem chi tiết</a>
+            </div>
+        </div>
+    </div>

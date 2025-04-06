@@ -24,6 +24,7 @@ namespace WebBarberShopBooking.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service);
+            // Removed Product include
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -49,9 +50,10 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Reviews/Create
         [Authorize]
-        public IActionResult Create(int? serviceId)
+        public IActionResult Create(int? serviceId) // Modified: Removed productId
         {
             ViewBag.ServiceId = serviceId;
+            // Removed ViewBag.ProductId
             return View();
         }
 
@@ -59,7 +61,7 @@ namespace WebBarberShopBooking.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ServiceId,Rating,Comment")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,ServiceId,Rating,Comment")] Review review) // Modified: Removed ProductId
         {
             if (ModelState.IsValid)
             {
@@ -145,7 +147,15 @@ namespace WebBarberShopBooking.Controllers
                     }
                 }
 
-                return RedirectToAction("Details", "Services", new { id = review.ServiceId });
+
+                if (review.ServiceId.HasValue)
+                {
+                    return RedirectToAction("Details", "Services", new { id = review.ServiceId });
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Home");
+                }
             }
 
             return View(review);
