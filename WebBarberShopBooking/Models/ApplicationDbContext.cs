@@ -53,7 +53,7 @@ namespace WebBarberShopBooking.Models
                 .HasOne(od => od.Service)
                 .WithMany(s => s.OrderDetails)
                 .HasForeignKey(od => od.ServiceId)
-                .OnDelete(DeleteBehavior.SetNull); // Khi Service bị xóa, ServiceId trong OrderDetail sẽ 
+                .OnDelete(DeleteBehavior.SetNull); // Khi Service bị xóa, ServiceId trong OrderDetail sẽ là null
 
             builder.Entity<Review>()
                 .HasOne(r => r.User)
@@ -67,12 +67,18 @@ namespace WebBarberShopBooking.Models
                 .HasForeignKey(r => r.ServiceId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-
             builder.Entity<Appointment>()
                 .HasOne(a => a.Stylist)
                 .WithMany(s => s.Appointments)
                 .HasForeignKey(a => a.StylistId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Ràng buộc ngày tháng cho StartDate và EndDate trong Promotion
+            //ràng buộc DiscountPercentage cho Promotion luôn có giá trị nằm trong khoảng từ 0 đến 1
+            builder.Entity<Promotion>().ToTable(t => {
+                t.HasCheckConstraint("CK_check_date", "[EndDate] > [StartDate]");
+                t.HasCheckConstraint("CK_check_promo", "[DiscountPercentage] IS NULL OR ([DiscountPercentage] > 0 AND [DiscountPercentage] <= 1)");
+            });
         }
     }
 }

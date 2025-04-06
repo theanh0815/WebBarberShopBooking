@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebBarberShopBooking.Models;
 
@@ -11,9 +12,11 @@ using WebBarberShopBooking.Models;
 namespace WebBarberShopBooking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250405191738_constraints")]
+    partial class constraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,6 +196,24 @@ namespace WebBarberShopBooking.Migrations
                     b.ToTable("Appointments");
                 });
 
+            modelBuilder.Entity("WebBarberShopBooking.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("WebBarberShopBooking.Models.GalleryImage", b =>
                 {
                     b.Property<int>("Id")
@@ -287,6 +308,9 @@ namespace WebBarberShopBooking.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -300,9 +324,44 @@ namespace WebBarberShopBooking.Migrations
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("ServiceId");
 
                     b.ToTable("OrderDetails");
+                });
+
+            modelBuilder.Entity("WebBarberShopBooking.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("WebBarberShopBooking.Models.Promotion", b =>
@@ -357,6 +416,9 @@ namespace WebBarberShopBooking.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -368,6 +430,8 @@ namespace WebBarberShopBooking.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("ServiceId");
 
@@ -627,6 +691,11 @@ namespace WebBarberShopBooking.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WebBarberShopBooking.Models.Product", "Product")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("WebBarberShopBooking.Models.Service", "Service")
                         .WithMany("OrderDetails")
                         .HasForeignKey("ServiceId")
@@ -634,11 +703,29 @@ namespace WebBarberShopBooking.Migrations
 
                     b.Navigation("Order");
 
+                    b.Navigation("Product");
+
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("WebBarberShopBooking.Models.Product", b =>
+                {
+                    b.HasOne("WebBarberShopBooking.Models.Category", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("WebBarberShopBooking.Models.Review", b =>
                 {
+                    b.HasOne("WebBarberShopBooking.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("WebBarberShopBooking.Models.Service", "Service")
                         .WithMany()
                         .HasForeignKey("ServiceId")
@@ -650,12 +737,24 @@ namespace WebBarberShopBooking.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Product");
+
                     b.Navigation("Service");
 
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WebBarberShopBooking.Models.Category", b =>
+                {
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("WebBarberShopBooking.Models.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
+                });
+
+            modelBuilder.Entity("WebBarberShopBooking.Models.Product", b =>
                 {
                     b.Navigation("OrderDetails");
                 });
