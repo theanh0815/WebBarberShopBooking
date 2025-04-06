@@ -58,6 +58,143 @@ namespace WebBarberShopBooking.Controllers
             }
         }
 
+        // POST: Order/AddToCart (Thêm sản phẩm vào giỏ hàng)
+        // Sửa lại phương thức AddToCart
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToCart(int serviceId, int quantity = 1)
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var service = await _context.Services.FindAsync(serviceId); // Thêm dòng này để lấy service
+
+                if (service == null)
+                {
+                    return NotFound();
+                }
+
+                // Lấy đơn hàng Pending
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.UserId == user.Id && o.Status == OrderStatus.Pending);
+
+                if (order == null)
+                {
+                    order = new Order
+                    {
+                        UserId = user.Id,
+                        OrderDate = DateTime.Now,
+                        Status = OrderStatus.Pending
+                    };
+                    _context.Orders.Add(order);
+                    await _context.SaveChangesAsync();
+                }
+
+                // Kiểm tra service đã có trong giỏ chưa
+                var existingItem = await _context.OrderDetails
+                    .FirstOrDefaultAsync(od => od.OrderId == order.Id && od.ServiceId == serviceId);
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += quantity;
+                    _context.Update(existingItem);
+                }
+                else
+                {
+                    var cartItem = new OrderDetail
+                    {
+                        OrderId = order.Id,
+                        ServiceId = serviceId,
+                        Quantity = quantity,
+                        UnitPrice = service.Price
+                    };
+                    _context.OrderDetails.Add(cartItem);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Cart));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi thêm vào giỏ hàng.");
+                return View("Error");
+            }
+        }
+
+        // POST: Order/RemoveFromCart (Xóa sản phẩm khỏi giỏ hàng)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveFromCart(int orderDetailId)
+        {
+            try
+            {
+                var cartItem = await _context.OrderDetails.FindAsync(orderDetailId);
+                if (cartItem != null)
+                {
+                    _context.OrderDetails.Remove(cartItem);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Cart));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi xóa khỏi giỏ hàng.");
+                return View("Error");
+            }
+        }
+
+        // POST: Order/UpdateCart (Cập nhật số lượng sản phẩm trong giỏ hàng)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCart(int orderDetailId, int quantity)
+        {
+            try
+            {
+                var cartItem = await _context.OrderDetails.FindAsync(orderDetailId);
+                if (cartItem != null)
+                {
+                    cartItem.Quantity = quantity;
+                    _context.Update(cartItem);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Cart));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi cập nhật giỏ hàng.");
+                return View("Error");
+            }
+        }
+
+        // GET: Order/Checkout (Hiển thị trang thanh toán)
+        public async Task<IActionResult> Checkout()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.UserId == user.Id && o.Status == OrderStatus.Pending);
+
+                if (order == null)
+                {
+                    return RedirectToAction(nameof(Cart)); // Nếu không có đơn hàng Pending, quay lại giỏ hàng
+                }
+
+                var cartItems = await _context.OrderDetails
+                    .Where(od => od.OrderId == order.Id)
+                    .ToListAsync();
+
+                ViewBag.TotalAmount = cartItems.Sum(item => item.Quantity * item.UnitPrice);
+
+                return View(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi hiển thị trang thanh toán.");
+                return View("Error");
+            }
+        }
+
         // POST: Order/Checkout (Xử lý thanh toán)
         [HttpPost]
         [ValidateAntiForgeryToken]

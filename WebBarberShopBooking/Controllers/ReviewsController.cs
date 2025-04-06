@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -50,10 +49,9 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Reviews/Create
         [Authorize]
-        public IActionResult Create(int? serviceId, int? productId)
+        public IActionResult Create(int? serviceId)
         {
             ViewBag.ServiceId = serviceId;
-            ViewBag.ProductId = productId;
             return View();
         }
 
@@ -61,7 +59,7 @@ namespace WebBarberShopBooking.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ServiceId,ProductId,Rating,Comment")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,ServiceId,Rating,Comment")] Review review)
         {
             if (ModelState.IsValid)
             {
@@ -102,7 +100,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -126,7 +124,7 @@ namespace WebBarberShopBooking.Controllers
                     var existingReview = await _context.Reviews.FindAsync(id);
                     if (existingReview.UserId != _userManager.GetUserId(User))
                     {
-                        return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                        return Forbid();
                     }
 
                     existingReview.Rating = review.Rating;
@@ -147,15 +145,9 @@ namespace WebBarberShopBooking.Controllers
                     }
                 }
 
-                if (review.ServiceId.HasValue)
-                {
-                    return RedirectToAction("Details", "Services", new { id = review.ServiceId });
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+                return RedirectToAction("Details", "Services", new { id = review.ServiceId });
             }
+
             return View(review);
         }
 
@@ -179,7 +171,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -194,7 +186,7 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews.FindAsync(id);
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             _context.Reviews.Remove(review);
