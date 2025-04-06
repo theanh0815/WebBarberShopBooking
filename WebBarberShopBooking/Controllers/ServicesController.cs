@@ -80,7 +80,7 @@ namespace WebBarberShopBooking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,ImageUrl")] Service service)
         {
-            if (ModelState.IsValid)
+            if (service != null)
             {
                 try
                 {
