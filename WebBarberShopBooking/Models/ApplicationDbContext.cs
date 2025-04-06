@@ -73,6 +73,13 @@ namespace WebBarberShopBooking.Models
                 .WithMany(s => s.Appointments)
                 .HasForeignKey(a => a.StylistId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // Ràng buộc ngày tháng cho StartDate và EndDate trong Promotion
+            //ràng buộc DiscountPercentage cho Promotion luôn có giá trị nằm trong khoảng từ 0 đến 1
+            builder.Entity<Promotion>().ToTable(t => {
+                t.HasCheckConstraint("CK_check_date", "[EndDate] > [StartDate]");
+                t.HasCheckConstraint("CK_check_promo", "[DiscountPercentage] IS NULL OR ([DiscountPercentage] > 0 AND [DiscountPercentage] <= 1)");
+            });
         }
     }
 }

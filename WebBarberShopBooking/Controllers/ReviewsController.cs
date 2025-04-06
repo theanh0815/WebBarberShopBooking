@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -40,7 +39,6 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                // Removed Product include
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
@@ -149,6 +147,7 @@ namespace WebBarberShopBooking.Controllers
                     }
                 }
 
+
                 if (review.ServiceId.HasValue)
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
@@ -158,6 +157,7 @@ namespace WebBarberShopBooking.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
+
             return View(review);
         }
 
@@ -173,7 +173,6 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                // Removed Product include
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {

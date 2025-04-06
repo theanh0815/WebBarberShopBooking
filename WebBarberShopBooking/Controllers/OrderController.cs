@@ -66,19 +66,30 @@ namespace WebBarberShopBooking.Controllers
             try
             {
                 var user = await _userManager.GetUserAsync(User);
+                var service = await _context.Services.FindAsync(serviceId); // Thêm dòng này để lấy service
+                if (service == null)
+                {
+                    return NotFound();
+                }
 
-                // Lấy hoặc tạo đơn hàng Pending
+                // Lấy đơn hàng Pending
                 var order = await _context.Orders
                     .FirstOrDefaultAsync(o => o.UserId == user.Id && o.Status == OrderStatus.Pending);
 
                 if (order == null)
                 {
-                    order = new Order { UserId = user.Id, OrderDate = DateTime.Now, Status = OrderStatus.Pending };
+                    order = new Order
+                    {
+                        UserId = user.Id,
+                        OrderDate = DateTime.Now,
+                        Status = OrderStatus.Pending
+                    };
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
                 }
 
                 // Kiểm tra xem dịch vụ đã có trong giỏ hàng chưa
+
                 var existingItem = await _context.OrderDetails
                     .FirstOrDefaultAsync(od => od.OrderId == order.Id && od.ServiceId == serviceId);
 
