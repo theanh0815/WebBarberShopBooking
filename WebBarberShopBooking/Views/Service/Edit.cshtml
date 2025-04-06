@@ -1,16 +1,18 @@
 ﻿@model WebBarberShopBooking.Models.Service
 
 @{
-    ViewData["Title"] = "Chỉnh sửa dịch vụ";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>Edit Service</h1>
 
+<hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageUrl" />  @* Hidden field for existing image path *@
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -27,23 +29,51 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label class="control-label">Current Image</label>
+                <img src="@Model.ImageUrl" alt="Current Image" style="max-width: 200px; max-height: 200px;" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Lưu" class="btn btn-primary" />
+                <label class="control-label">New Image</label>
+                <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" />
+            </div>
+            <div class="form-group">
+                <div class="mt-2" id="imagePreview" style="display:none;">
+                    <img id="preview" src="#" alt="Preview" class="img-thumbnail" style="max-height: 200px;" />
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Quay lại danh sách</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Image preview script (same as Create view)
+         document.getElementById('ImageFile').addEventListener('change', function(e) {
+            var preview = document.getElementById('preview');
+            var imagePreview = document.getElementById('imagePreview');
+
+            if (e.target.files && e.target.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(e.target.files[0]);
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+    </script>
 }
