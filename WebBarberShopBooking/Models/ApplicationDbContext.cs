@@ -25,7 +25,6 @@ namespace WebBarberShopBooking.Models
             base.OnModelCreating(builder);
 
             // Định nghĩa các ràng buộc và mối quan hệ (nếu cần)
-            // Ví dụ:
             builder.Entity<Appointment>()
                 .HasOne(a => a.User)
                 .WithMany(u => u.Appointments)

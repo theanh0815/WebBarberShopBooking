@@ -1,8 +1,9 @@
-﻿
+
 using WebBarberShopBooking.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebBarberShopBooking.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+
 // Thêm Identity với User tùy chỉnh và hỗ trợ Roles
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false) // Tắt xác nhận tài khoản email cho mục đích demo
    .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -21,6 +23,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddRazorPages();
+
+builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
 var app = builder.Build();
 

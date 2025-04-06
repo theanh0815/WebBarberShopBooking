@@ -94,9 +94,11 @@ namespace WebBarberShopBooking.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /Account/Profile
+        // POST: /Account/Profile
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(ProfileViewModel model)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -104,48 +106,16 @@ namespace WebBarberShopBooking.Controllers
                 return NotFound();
             }
 
-            var model = new ProfileViewModel
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Address = user.Address
-            };
-
-            return View(model);
-        }
-
-        // POST: /Account/Profile
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> Profile(ProfileViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    return NotFound();
-                }
-
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.PhoneNumber = model.PhoneNumber;
-                user.Address = model.Address;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    TempData["SuccessMessage"] = "Profile updated successfully.";
-                    return RedirectToAction("Profile");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+                return RedirectToAction("Profile");
             }
             return View(model);
         }

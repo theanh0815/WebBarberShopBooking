@@ -1,71 +1,113 @@
-﻿/* Đảm bảo chiều cao của toàn bộ trang */
+﻿/* Biến màu */
+:root {
+    --primary-color: #1a1a2e;
+    --secondary-color: #c19a6b;
+    --accent-color: #e94560;
+    --light-bg: #f7f7f7;
+    --border-color: #e5e5e5;
+    --text-dark: #333;
+    --text-light: #eee;
+}
+
+/* Đảm bảo chiều cao toàn bộ trang */
 html, body {
     height: 100%;
     margin: 0;
+    padding: 0;
 }
 
-/* Cấu hình Flexbox cho body */
+/* Body cấu hình flex */
 body {
     display: flex;
     flex-direction: column;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-dark);
     line-height: 1.6;
-    min-height: 100vh; /* Đảm bảo chiều cao của body luôn chiếm 100% */
+    min-height: 100vh;
+    background-color: #fff;
 }
 
-/* Phần nội dung chính chiếm không gian còn lại */
+/* Main chiếm phần còn lại của trang */
 main {
     flex: 1;
-    padding: 3rem 0;
+    padding: 3rem 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* Footer luôn nằm ở dưới cùng */
+/* Footer luôn nằm ở dưới */
 .footer {
+    position: relative;
     background-color: var(--primary-color);
     color: var(--text-light);
-    padding: 3rem 0 2rem 0;
-    margin-top: auto; /* Đảm bảo footer nằm ở dưới cùng */
-    white-space: nowrap;
-    line-height: 60px;
+    padding: 3rem 1rem 2rem;
+    margin-top: auto;
+    border-top: 2px solid var(--border-color);
 }
 
-/* Các kiểu khác không thay đổi */
+/* Navbar brand */
 a.navbar-brand {
     white-space: normal;
     text-align: center;
-    word-break: break-all;
+    word-break: break-word;
 }
 
+/* Liên kết */
 a {
     color: #0077cc;
+    text-decoration: none;
 }
 
+    a:hover {
+        color: #005fa3;
+        text-decoration: underline;
+    }
+
+/* Nút chính */
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    .btn-primary:hover {
+        background-color: #155a9c;
+    }
+
+/* Nav pills */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
     color: #fff;
     background-color: #1b6ec2;
     border-color: #1861ac;
 }
 
+/* Border tiện ích */
 .border-top {
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid var(--border-color);
 }
 
 .border-bottom {
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--border-color);
 }
 
+.enhanced-border-bottom {
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Đổ bóng */
 .box-shadow {
     box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
 
+/* Nút accept policy */
 button.accept-policy {
     font-size: 1rem;
     line-height: inherit;
+}
+
+/* Responsive footer - tuỳ chọn thêm nếu nhiều cột */
+@media (max-width: 768px) {
+    .footer {
+        text-align: center;
+    }
 }

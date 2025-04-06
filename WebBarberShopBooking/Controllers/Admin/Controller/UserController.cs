@@ -109,7 +109,6 @@ namespace WebBarberShopBooking.Controllers.Admin
                     existingUser.Email = user.Email;
                     existingUser.FirstName = user.FirstName;
                     existingUser.LastName = user.LastName;
-                    existingUser.Address = user.Address;
                     existingUser.PhoneNumber = user.PhoneNumber;
 
                     var result = await _userManager.UpdateAsync(existingUser);
