@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +24,7 @@ namespace WebBarberShopBooking.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service);
+            // Removed Product include
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -50,10 +50,10 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Reviews/Create
         [Authorize]
-        public IActionResult Create(int? serviceId, int? productId)
+        public IActionResult Create(int? serviceId) // Modified: Removed productId
         {
             ViewBag.ServiceId = serviceId;
-            ViewBag.ProductId = productId;
+            // Removed ViewBag.ProductId
             return View();
         }
 
@@ -61,7 +61,7 @@ namespace WebBarberShopBooking.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ServiceId,ProductId,Rating,Comment")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,ServiceId,Rating,Comment")] Review review) // Modified: Removed ProductId
         {
             if (ModelState.IsValid)
             {
@@ -102,7 +102,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -126,7 +126,7 @@ namespace WebBarberShopBooking.Controllers
                     var existingReview = await _context.Reviews.FindAsync(id);
                     if (existingReview.UserId != _userManager.GetUserId(User))
                     {
-                        return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                        return Forbid();
                     }
 
                     existingReview.Rating = review.Rating;
@@ -147,6 +147,7 @@ namespace WebBarberShopBooking.Controllers
                     }
                 }
 
+
                 if (review.ServiceId.HasValue)
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
@@ -156,6 +157,7 @@ namespace WebBarberShopBooking.Controllers
                     return RedirectToAction("Index", "Home");
                 }
             }
+
             return View(review);
         }
 
@@ -179,7 +181,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -194,7 +196,7 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews.FindAsync(id);
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             _context.Reviews.Remove(review);
