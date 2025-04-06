@@ -14,7 +14,7 @@ namespace WebBarberShopBooking.Models
         public string UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; }
+        public User? User { get; set; }
 
         public DateTime OrderDate { get; set; } = DateTime.Now;
 
