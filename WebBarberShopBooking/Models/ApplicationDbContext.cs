@@ -11,8 +11,6 @@ namespace WebBarberShopBooking.Models
         // DbSet cho các Models của bạn
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<News> News { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -58,18 +56,6 @@ namespace WebBarberShopBooking.Models
                 .HasForeignKey(od => od.ServiceId)
                 .OnDelete(DeleteBehavior.SetNull); // Khi Service bị xóa, ServiceId trong OrderDetail sẽ là null
 
-            builder.Entity<OrderDetail>()
-                .HasOne(od => od.Product)
-                .WithMany(p => p.OrderDetails)
-                .HasForeignKey(od => od.ProductId)
-                .OnDelete(DeleteBehavior.SetNull); // Khi Product bị xóa, ProductId trong OrderDetail sẽ là null
-
-            builder.Entity<Product>()
-                .HasOne(p => p.Category)
-                .WithMany(c => c.Products)
-                .HasForeignKey(p => p.CategoryId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.Entity<Review>()
                 .HasOne(r => r.User)
                 .WithMany() // User có thể có nhiều Review
@@ -80,12 +66,6 @@ namespace WebBarberShopBooking.Models
                 .HasOne(r => r.Service)
                 .WithMany() // Service có thể có nhiều Review
                 .HasForeignKey(r => r.ServiceId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            builder.Entity<Review>()
-                .HasOne(r => r.Product)
-                .WithMany() // Product có thể có nhiều Review
-                .HasForeignKey(r => r.ProductId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.Entity<Appointment>()

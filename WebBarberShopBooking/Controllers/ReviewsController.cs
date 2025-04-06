@@ -24,7 +24,8 @@ namespace WebBarberShopBooking.Controllers
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service).Include(r => r.Product);
+            var applicationDbContext = _context.Reviews.Include(r => r.User).Include(r => r.Service);
+            // Removed Product include
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -39,7 +40,7 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                .Include(r => r.Product)
+                // Removed Product include
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
@@ -51,10 +52,10 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Reviews/Create
         [Authorize]
-        public IActionResult Create(int? serviceId, int? productId)
+        public IActionResult Create(int? serviceId) // Modified: Removed productId
         {
             ViewBag.ServiceId = serviceId;
-            ViewBag.ProductId = productId;
+            // Removed ViewBag.ProductId
             return View();
         }
 
@@ -62,7 +63,7 @@ namespace WebBarberShopBooking.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ServiceId,ProductId,Rating,Comment")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,ServiceId,Rating,Comment")] Review review) // Modified: Removed ProductId
         {
             if (ModelState.IsValid)
             {
@@ -76,10 +77,6 @@ namespace WebBarberShopBooking.Controllers
                 if (review.ServiceId.HasValue)
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
-                }
-                else if (review.ProductId.HasValue)
-                {
-                    return RedirectToAction("Details", "Products", new { id = review.ProductId });
                 }
                 else
                 {
@@ -107,7 +104,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -131,7 +128,7 @@ namespace WebBarberShopBooking.Controllers
                     var existingReview = await _context.Reviews.FindAsync(id);
                     if (existingReview.UserId != _userManager.GetUserId(User))
                     {
-                        return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                        return Forbid();
                     }
 
                     existingReview.Rating = review.Rating;
@@ -156,10 +153,6 @@ namespace WebBarberShopBooking.Controllers
                 {
                     return RedirectToAction("Details", "Services", new { id = review.ServiceId });
                 }
-                else if (review.ProductId.HasValue)
-                {
-                    return RedirectToAction("Details", "Products", new { id = review.ProductId });
-                }
                 else
                 {
                     return RedirectToAction("Index", "Home");
@@ -180,7 +173,7 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Service)
-                .Include(r => r.Product)
+                // Removed Product include
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (review == null)
             {
@@ -189,7 +182,7 @@ namespace WebBarberShopBooking.Controllers
 
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             return View(review);
@@ -204,7 +197,7 @@ namespace WebBarberShopBooking.Controllers
             var review = await _context.Reviews.FindAsync(id);
             if (review.UserId != _userManager.GetUserId(User))
             {
-                return Forbid(); // Hoặc RedirectToAction("Index", "Home");
+                return Forbid();
             }
 
             _context.Reviews.Remove(review);
@@ -213,10 +206,6 @@ namespace WebBarberShopBooking.Controllers
             if (review.ServiceId.HasValue)
             {
                 return RedirectToAction("Details", "Services", new { id = review.ServiceId });
-            }
-            else if (review.ProductId.HasValue)
-            {
-                return RedirectToAction("Details", "Products", new { id = review.ProductId });
             }
             else
             {

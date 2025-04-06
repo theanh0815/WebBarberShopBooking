@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Admin\NewFolder\**" />
+    <Content Remove="Admin\NewFolder\**" />
+    <EmbeddedResource Remove="Admin\NewFolder\**" />
+    <None Remove="Admin\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
