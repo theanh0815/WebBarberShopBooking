@@ -1,48 +1,90 @@
 ﻿@model WebBarberShopBooking.Models.Service
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo mới dịch vụ";
 }
-<h1>TẠO MỚI SẢN PHẨM</h1>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-3">
-                <label asp-for="Name" class="control-label">Tên dịch vụ</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Description" class="control-label">Mô tả</label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Price" class="control-label">Giá (VNĐ)</label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label class="control-label">Hình ảnh</label>
-                <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" />
-                <input asp-for="ImageUrl" type="hidden" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <div class="mt-2" id="imagePreview" style="display:none;">
-                    <img id="preview" src="#" alt="Xem trước hình ảnh" class="img-thumbnail" style="max-height: 200px;" />
+@section Styles{
+    <link rel="stylesheet" href="~/css/edit-service.css" />
+}
+
+
+<div class="container py-4 service-edit-container">
+    <div class="row mb-4 service-edit-header">
+        <div class="col">
+            <h2 class="service-edit-title">TẠO MỚI DỊCH VỤ</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card service-edit-card">
+                <div class="card-body p-4">
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold">Tên dịch vụ</label>
+                            <input asp-for="Name" class="form-control form-control-lg" />
+                            <span asp-validation-for="Name" class="field-validation-error"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="field-validation-error"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Price" class="form-label fw-bold">Giá (VNĐ)</label>
+                                <div class="input-group price-input-group">
+                                    <input asp-for="Price" class="form-control" />
+                                    <span class="input-group-text">₫</span>
+                                </div>
+                                <span asp-validation-for="Price" class="field-validation-error"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Hình ảnh dịch vụ</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="ImageFile" name="ImageFile" class="form-control" accept="image/*" style="display: none;" />
+                                <input asp-for="ImageUrl" type="hidden" />
+                                <label for="ImageFile" class="file-input-label">
+                                    <i class="bi bi-upload file-input-icon"></i>
+                                    <span class="file-input-text" id="file-name">Chọn file hình ảnh</span>
+                                </label>
+                            </div>
+                            <div class="form-text">Chọn một file hình ảnh (JPG, PNG, WEBP...)</div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-save">
+                                <i class="bi bi-plus-circle me-2"></i>Tạo mới
+                            </button>
+                            <a asp-action="Index" class="btn btn-cancel">
+                                <i class="bi bi-arrow-left me-2"></i>Quay lại
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="form-group mb-3">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Tạo mới
-                </button>
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Quay lại
-                </a>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card service-edit-card preview-panel">
+                <div class="card-header preview-panel-header">
+                    <h5 class="mb-0">Xem trước</h5>
+                </div>
+                <div class="card-body p-3">
+                    <div class="preview-image-container">
+                        <img id="imagePreview" src="/images/no-image.png" alt="No image" class="preview-image" />
+                    </div>
+                    <h5 id="namePreview" class="preview-name">Tên dịch vụ</h5>
+                    <div id="pricePreview" class="preview-price">0 ₫</div>
+                    <p id="descriptionPreview" class="preview-description">Mô tả dịch vụ</p>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -51,23 +93,41 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        // Hiển thị xem trước hình ảnh khi chọn file
-        document.getElementById('ImageFile').addEventListener('change', function(e) {
-            var preview = document.getElementById('preview');
-            var imagePreview = document.getElementById('imagePreview');
+        // Live preview functionality
+        $(document).ready(function() {
+            // Update preview when input changes
+            $('#Name').on('input', function() {
+                $('#namePreview').text($(this).val() || 'Tên dịch vụ');
+            });
 
-            if (e.target.files && e.target.files[0]) {
-                var reader = new FileReader();
+            $('#Description').on('input', function() {
+                $('#descriptionPreview').text($(this).val() || 'Mô tả dịch vụ');
+            });
 
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    imagePreview.style.display = 'block';
+            $('#Price').on('input', function() {
+                const price = parseFloat($(this).val().replace(/,/g, ''));
+                if (!isNaN(price)) {
+                    $('#pricePreview').text(price.toLocaleString('vi-VN') + ' ₫');
+                } else {
+                    $('#pricePreview').text('0 ₫');
                 }
+            });
 
-                reader.readAsDataURL(e.target.files[0]);
-            } else {
-                imagePreview.style.display = 'none';
-            }
+            // Image file preview
+            $('#ImageFile').change(function() {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        $('#imagePreview').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(this.files[0]);
+
+                    // Update file name display
+                    $('#file-name').text(this.files[0].name);
+                }
+            });
         });
     </script>
 }

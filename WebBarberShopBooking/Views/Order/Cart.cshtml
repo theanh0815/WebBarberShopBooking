@@ -23,8 +23,7 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>
-
+                        <td> 
                             @if (item.Service != null)
                             {
                                 @item.Service.Name
@@ -53,7 +52,7 @@
                         <strong>Tổng tiền:</strong>
                     </td>
                     <td>
-                        @Model.Sum(item => item.Quantity * item.UnitPrice).ToString("C")
+                        @Model.Sum(item => item.Quantity * item.UnitPrice)
                     </td>
                     <td></td>
                 </tr>
