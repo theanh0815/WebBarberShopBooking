@@ -1,28 +1,196 @@
 ﻿@model WebBarberShopBooking.Models.News
-
 @{
     ViewData["Title"] = "Chi tiết tin tức";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Tin tức</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
 
-<div>
-    <h4>News</h4>
-    <hr />
-    <div class="row">
-        <div class="col-md-8">
-            <h2>@Model.Title</h2>
-            <p class="text-muted">Ngày xuất bản: @Model.PublishDate.ToString("dd/MM/yyyy HH:mm")</p>
-            <img src="@Model.ImageUrl" class="img-fluid mb-3" alt="@Model.Title">
-            <p>@Model.Content</p>
+    <div class="card border-0 shadow">
+        <div class="card-body p-0">
+            <!-- Banner image -->
+            <div class="position-relative">
+                <img src="@Model.ImageUrl" class="img-fluid w-100" alt="@Model.Title" style="max-height: 400px; object-fit: cover;">
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i> Sửa
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i> Xóa
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Article metadata -->
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="badge bg-primary me-2">Tin tức</span>
+                            <span class="text-muted">
+                                <i class="far fa-calendar-alt me-1"></i>
+                                @Model.PublishDate.ToString("dd/MM/yyyy HH:mm")
+                            </span>
+                        </div>
+
+                        <!-- Article title -->
+                        <h1 class="display-4 fw-bold mb-4">@Model.Title</h1>
+
+                        <!-- Article content -->
+                        <div class="news-content fs-5">
+                            @Html.Raw(Model.Content)
+                        </div>
+
+                        <!-- Social sharing options -->
+                        <div class="mt-5 pt-4 border-top">
+                            <h5><i class="fas fa-share-alt me-2"></i>Chia sẻ bài viết này</h5>
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="javascript:void(0)" onclick="shareOnFacebook()" class="btn btn-sm btn-outline-primary">
+                                    <i class="fab fa-facebook me-1"></i> Facebook
+                                </a>
+                                <a href="javascript:void(0)" onclick="shareOnTwitter()" class="btn btn-sm btn-outline-info">
+                                    <i class="fab fa-twitter me-1"></i> Twitter
+                                </a>
+                                <a href="javascript:void(0)" onclick="shareOnEmail()" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-envelope me-1"></i> Email
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 mt-5 mt-lg-0">
+                        <!-- Author info card -->
+                        <div class="card border shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Về tác giả</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <img src="/images/default-avatar.jpg" alt="Author" class="rounded-circle" width="60" height="60">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-1">Admin</h5>
+                                        <p class="text-muted mb-0">Quản trị viên</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Related articles card -->
+                        <div class="card border shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Tin tức liên quan</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush">
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <img src="/images/placeholder.jpg" width="50" height="50" class="rounded" alt="Thumbnail">
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Kiểu tóc nam hot nhất 2023</h6>
+                                                <small class="text-muted">14/03/2023</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <img src="/images/placeholder.jpg" width="50" height="50" class="rounded" alt="Thumbnail">
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">Cách chăm sóc râu đúng cách</h6>
+                                                <small class="text-muted">28/02/2023</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <img src="/images/placeholder.jpg" width="50" height="50" class="rounded" alt="Thumbnail">
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-1">5 xu hướng cắt tóc nam 2023</h6>
+                                                <small class="text-muted">10/02/2023</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="mt-4 text-center">
+        <a asp-action="Index" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách tin tức
+        </a>
+    </div>
 </div>
-<div>
-    @if (User.IsInRole("Admin"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Sửa</a>
-        <a asp-action = "Delete" asp - route - id = "@Model.Id" class="btn btn-sm btn-danger">Xóa</a>
-    }
-    <a asp-action="Index">Quay lại danh sách</a>
-</div>
+
+@section Styles {
+    <style>
+        .news-content {
+            line-height: 1.8;
+        }
+
+            .news-content p {
+                margin-bottom: 1.5rem;
+            }
+
+            .news-content img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin: 1.5rem 0;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Hiệu ứng zoom nhẹ cho hình ảnh trong nội dung
+            $('.news-content img').hover(
+                function() { $(this).css('transform', 'scale(1.01)'); },
+                function() { $(this).css('transform', 'scale(1)'); }
+            );
+        });
+
+        // Các hàm chia sẻ mạng xã hội
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('@Model.Title');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank');
+        }
+
+        function shareOnEmail() {
+            const subject = encodeURIComponent('@Model.Title');
+            const body = encodeURIComponent('Xem bài viết này: ' + window.location.href);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+    </script>
+}

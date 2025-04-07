@@ -92,7 +92,7 @@ namespace WebBarberShopBooking.Controllers
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Lỗi khi tạo dịch vụ.");
-                    return View("Error");
+                    return RedirectToAction("Error", "Home");
                 }
             }
             return View(service);
