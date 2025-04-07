@@ -1,55 +1,41 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebBarberShopBooking.Models;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http; // For IFormFile
-using System.IO; // For file operations
+using WebBarberShopBooking.Repositories;
 
-namespace WebBarberShopBooking.Controllers
-{
-    public class ServiceController : Controller
-    {
+namespace WebBarberShopBooking.Controllers {
+    public class ServiceController : Controller {
         private readonly IServiceRepository _serviceRepository;
         private readonly ILogger<ServiceController> _logger;
         private readonly string _imagePath = "wwwroot/images"; // Đường dẫn lưu ảnh
 
-        public ServiceController(IServiceRepository serviceRepository, ILogger<ServiceController> logger)
-        {
+        public ServiceController(IServiceRepository serviceRepository, ILogger<ServiceController> logger) {
             _serviceRepository = serviceRepository;
             _logger = logger;
         }
 
         // GET: Service/Index
         [Route("/Services")]
-        public async Task<IActionResult> Index()
-        {
-            try
-            {
+        public async Task<IActionResult> Index() {
+            try {
                 var services = await _serviceRepository.GetAllServicesAsync();
                 return View(services);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Lỗi khi lấy danh sách dịch vụ.");
                 return View("Error");
             }
         }
 
         // GET: Service/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Details(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
-            try
-            {
+            try {
                 var service = await _serviceRepository.GetServiceByIdAsync(id.Value);
-                if (service == null)
-                {
+                if (service == null) {
                     return NotFound();
                 }
 
@@ -62,9 +48,7 @@ namespace WebBarberShopBooking.Controllers
                 // ViewData["Reviews"] = reviews;
 
                 return View(service);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Lỗi khi xem chi tiết dịch vụ.");
                 return View("Error");
             }
@@ -72,8 +56,7 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Service/Create
         //[Authorize(Roles = "Admin")]
-        public IActionResult Create()
-        {
+        public IActionResult Create() {
             return View();
         }
 
@@ -81,63 +64,35 @@ namespace WebBarberShopBooking.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Name,Description,Price,ImageFile")] Service service)
-        {
-            {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        // Xử lý ảnh
-                        if (service.ImageFile != null && service.ImageFile.Length > 0)
-                        {
-                            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(service.ImageFile.FileName);
-                            string filePath = Path.Combine(_imagePath, fileName);
-                            using (var fileStream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await service.ImageFile.CopyToAsync(fileStream);
-                            }
-                            service.ImageUrl = "/images/" + fileName;
-                        }
-                        else
-                        {
-                            service.ImageUrl = "/images/default.png"; // Hình ảnh mặc định
-                        }
-                        await _serviceRepository.AddServiceAsync(service);
-                        return RedirectToAction(nameof(Index));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Lỗi khi tạo dịch vụ.", ex);
-                        return View("Error");
-                    }
-                }
-
+        public async Task<IActionResult> Create(Service service, IFormFile ImageUrl) {
+            try {
+                if (ImageUrl != null)
+                    service.ImageUrl = await SaveImage(ImageUrl, service.Id.ToString());
+                await _serviceRepository.AddServiceAsync(service);
+                return RedirectToAction(nameof(Index));
+            } catch {
+                return View(service);
             }
-            
-             return View(service);
+        }
+        private async Task<string> SaveImage(IFormFile image, string fileName) {
+            var savePath = Path.Combine(_imagePath, fileName);
+
+            using (var fileStream = new FileStream(savePath, FileMode.Create)) {
+                await image.CopyToAsync(fileStream);
+            }
+            return "images/" + image.FileName;
         }
 
         // GET: Service/Edit/5
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            try
-            {
-                var service = await _serviceRepository.GetServiceByIdAsync(id.Value);
-                if (service == null)
-                {
+        public async Task<IActionResult> Edit(int id) {
+            try {
+                var service = await _serviceRepository.GetServiceByIdAsync(id);
+                if (service == null) {
                     return NotFound();
                 }
                 return View(service);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Lỗi khi hiển thị trang sửa dịch vụ.", ex);
                 return View("Error");
             }
@@ -147,68 +102,24 @@ namespace WebBarberShopBooking.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,ImageFile")] Service service)
-        {
-            if (id != service.Id)
-            {
+        public async Task<IActionResult> Edit(int id, Service service) {
+            if (id != service.Id) {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            if (ModelState.IsValid) {
+                try {
                     var existingService = await _serviceRepository.GetServiceByIdAsync(id);
-                    if (existingService == null)
-                    {
+                    if (existingService == null) {
                         return NotFound();
                     }
 
-                    // Xử lý ảnh
-                    if (service.ImageFile != null && service.ImageFile.Length > 0)
-                    {
-                        // Xóa ảnh cũ
-                        if (!string.IsNullOrEmpty(existingService.ImageUrl) && existingService.ImageUrl != "/images/default.png")
-                        {
-                            string oldFilePath = Path.Combine("wwwroot", existingService.ImageUrl.TrimStart('/'));
-                            if (System.IO.File.Exists(oldFilePath))
-                            {
-                                System.IO.File.Delete(oldFilePath);
-                            }
-                        }
-
-                        // Lưu ảnh mới
-                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(service.ImageFile.FileName);
-                        string filePath = Path.Combine(_imagePath, fileName);
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await service.ImageFile.CopyToAsync(fileStream);
-                        }
-                        service.ImageUrl = "/images/" + fileName;
-                    }
-                    else
-                    {
-                        service.ImageUrl = existingService.ImageUrl; // Giữ nguyên ảnh cũ
-                    }
-
-                    service.Id = id; // Đảm bảo ID được gán đúng
                     await _serviceRepository.UpdateServiceAsync(service);
                     return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!await _serviceRepository.ServiceExistsAsync(service.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        _logger.LogError(ex, "Lỗi đồng thời khi cập nhật dịch vụ.", ex);
-                        return View("Error");
-                    }
-                }
-                catch (Exception ex)
-                {
+                } catch (DbUpdateConcurrencyException ex) {
+                    _logger.LogError(ex, "Lỗi đồng thời khi cập nhật dịch vụ.", ex);
+                    return View("Error");
+                } catch (Exception ex) {
                     _logger.LogError(ex, "Lỗi khi cập nhật dịch vụ.", ex);
                     return View(service);
                 }
@@ -218,24 +129,18 @@ namespace WebBarberShopBooking.Controllers
 
         // GET: Service/Delete/5
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Delete(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
-            try
-            {
+            try {
                 var service = await _serviceRepository.GetServiceByIdAsync(id.Value);
-                if (service == null)
-                {
+                if (service == null) {
                     return NotFound();
                 }
                 return View(service);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Lỗi khi hiển thị trang xóa dịch vụ.", ex);
                 return View("Error");
             }
@@ -245,19 +150,14 @@ namespace WebBarberShopBooking.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
-        {
-            try
-            {
+        public async Task<IActionResult> DeleteConfirmed(int? id) {
+            try {
                 var service = await _serviceRepository.GetServiceByIdAsync(id.Value);
-                if (service != null)
-                {
+                if (service != null) {
                     // Xóa ảnh
-                    if (!string.IsNullOrEmpty(service.ImageUrl) && service.ImageUrl != "/images/default.png")
-                    {
+                    if (!string.IsNullOrEmpty(service.ImageUrl) && service.ImageUrl != "/images/default.png") {
                         string imagePath = Path.Combine("wwwroot", service.ImageUrl.TrimStart('/'));
-                        if (System.IO.File.Exists(imagePath))
-                        {
+                        if (System.IO.File.Exists(imagePath)) {
                             System.IO.File.Delete(imagePath);
                         }
                     }
@@ -266,17 +166,10 @@ namespace WebBarberShopBooking.Controllers
                 }
 
                 return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Lỗi khi xóa dịch vụ.", ex);
                 return View("Error");
             }
-        }
-
-        private bool ServiceExists(int id)
-        {
-            return _serviceRepository.ServiceExistsAsync(id).Result; // Or use .GetAwaiter().GetResult() with caution
         }
     }
 }

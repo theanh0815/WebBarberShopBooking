@@ -21,13 +21,12 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Price" class="control-label">Giá (VNĐ)</label>
-                <input asp-for="Price" class="form-control" />
+                <input type="number" asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
-                <label class="control-label">Hình ảnh</label>
-                <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" />
-                <input asp-for="ImageUrl" type="hidden" />  @* Dòng này quan trọng! *@
+                <label asp-for="ImageUrl">Hình ảnh</label>
+                <input type="file" asp-for="ImageUrl" class="form-control"/>
                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">
@@ -51,24 +50,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        // Hiển thị xem trước hình ảnh khi chọn file
-        document.getElementById('ImageFile').addEventListener('change', function(e) {
-            var preview = document.getElementById('preview');
-            var imagePreview = document.getElementById('imagePreview');
-
-            if (e.target.files && e.target.files[0]) {
-                var reader = new FileReader();
-
-                 reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                }
-
-                reader.readAsDataURL(e.target.files[0]);
-            } else {
-                imagePreview.style.display = 'none';
-            }
-        });
-    </script>
+    
 }
