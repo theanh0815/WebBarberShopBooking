@@ -25,7 +25,14 @@ namespace WebBarberShopBooking.Repositories
         }
         public async Task UpdateServiceAsync(Service service)
         {
-            _context.Services.Update(service);
+            //update service in _context.services
+            var existingService = await GetServiceByIdAsync(service.Id);
+            if (existingService != null) {
+                existingService.Name = service.Name;
+                existingService.Description = service.Description;
+                existingService.Price = service.Price;
+                existingService.ImageUrl = service.ImageUrl;
+            } else throw new Exception("Service Not Existed");
             await _context.SaveChangesAsync();
         }
         public async Task DeleteServiceAsync(int id)

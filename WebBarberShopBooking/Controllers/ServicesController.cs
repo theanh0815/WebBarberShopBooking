@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebBarberShopBooking.Models;
 using WebBarberShopBooking.Repositories;
@@ -68,7 +67,7 @@ namespace WebBarberShopBooking.Controllers {
             try {
                 if (ImageUrl != null) {
                     var extension = Path.GetExtension(ImageUrl.FileName);
-                    var fileName = service.Id.ToString() + extension;
+                    var fileName = Guid.NewGuid().ToString() + extension;
                     service.ImageUrl = await SaveImage(ImageUrl, fileName);
                 }
                 await _serviceRepository.AddServiceAsync(service);
@@ -105,29 +104,34 @@ namespace WebBarberShopBooking.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, Service service) {
+        public async Task<IActionResult> Edit(int id, Service service, IFormFile ImageFile) {
             if (id != service.Id) {
                 return NotFound();
             }
 
-            if (ModelState.IsValid) {
-                try {
-                    var existingService = await _serviceRepository.GetServiceByIdAsync(id);
-                    if (existingService == null) {
-                        return NotFound();
+            try {
+                if (ImageFile != null) {
+                    // Xóa ảnh cũ nếu có
+                    if (!string.IsNullOrEmpty(service.ImageUrl) && service.ImageUrl != "/images/default.png") {
+                        string oldImagePath = Path.Combine("wwwroot", service.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldImagePath)) {
+                            System.IO.File.Delete(oldImagePath);
+                        }
                     }
-
-                    await _serviceRepository.UpdateServiceAsync(service);
-                    return RedirectToAction(nameof(Index));
-                } catch (DbUpdateConcurrencyException ex) {
-                    _logger.LogError(ex, "Lỗi đồng thời khi cập nhật dịch vụ.", ex);
-                    return View("Error");
-                } catch (Exception ex) {
-                    _logger.LogError(ex, "Lỗi khi cập nhật dịch vụ.", ex);
-                    return View(service);
+                    // Lưu ảnh mới
+                    var extension = Path.GetExtension(ImageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString() + extension;
+                    service.ImageUrl = await SaveImage(ImageFile, fileName);
                 }
+                await _serviceRepository.UpdateServiceAsync(service);
+                return RedirectToAction(nameof(Index));
+            } catch (DbUpdateConcurrencyException ex) {
+                _logger.LogError(ex, "Lỗi đồng thời khi cập nhật dịch vụ.", ex);
+                return View("Error");
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Lỗi khi cập nhật dịch vụ.", ex);
+                return View(service);
             }
-            return View(service);
         }
 
         // GET: Service/Delete/5
