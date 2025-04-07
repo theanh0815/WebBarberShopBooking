@@ -27,14 +27,22 @@ namespace WebBarberShopBooking.Repositories
         {
             //update service in _context.services
             var existingService = await GetServiceByIdAsync(service.Id);
+<<<<<<< HEAD
             if (existingService != null)
             {
+=======
+            if (existingService != null) {
+>>>>>>> 96da7bbf56ad42879bab1f9e7a1d8c36d46fe39e
                 existingService.Name = service.Name;
                 existingService.Description = service.Description;
                 existingService.Price = service.Price;
                 existingService.ImageUrl = service.ImageUrl;
+<<<<<<< HEAD
             }
             else throw new Exception("Service Not Existed");
+=======
+            } else throw new Exception("Service Not Existed");
+>>>>>>> 96da7bbf56ad42879bab1f9e7a1d8c36d46fe39e
             await _context.SaveChangesAsync();
         }
         public async Task DeleteServiceAsync(int id)

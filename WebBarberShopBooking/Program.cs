@@ -1,8 +1,8 @@
-
 using WebBarberShopBooking.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using WebBarberShopBooking.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +13,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-
 // Thêm Identity với User tùy chỉnh và hỗ trợ Roles
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false) // Tắt xác nhận tài khoản email cho mục đích demo
    .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -21,6 +20,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IServiceRepository, EFServiceRepository>();
 builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
@@ -67,42 +67,32 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("Role 'Admin' created successfully.");
     }
 
-    // Lấy email admin từ cấu hình
-    var adminUserEmail = builder.Configuration["AdminSettings:Email"];
+    // Tìm user theo email "admin@gmail.com" và gán quyền Admin
+    var adminUser = await userManager.FindByEmailAsync("admin@gmail.com");
 
-    if (!string.IsNullOrEmpty(adminUserEmail))
+    if (adminUser != null)
     {
-        // Tìm user theo email
-        var adminUser = await userManager.FindByEmailAsync(adminUserEmail);
-
-        if (adminUser != null)
+        // Gán role "Admin" cho user nếu chưa có
+        if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
         {
-            // Gán role "Admin" cho user nếu chưa có
-            if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+            var result = await userManager.AddToRoleAsync(adminUser, "Admin");
+            if (result.Succeeded)
             {
-                var result = await userManager.AddToRoleAsync(adminUser, "Admin");
-                if (result.Succeeded)
-                {
-                    Console.WriteLine($"User with email '{adminUserEmail}' added to 'Admin' role.");
-                }
-                else
-                {
-                    Console.WriteLine($"Failed to add user with email '{adminUserEmail}' to 'Admin' role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-                }
+                Console.WriteLine($"User with email 'admin@gmail.com' added to 'Admin' role.");
             }
             else
             {
-                Console.WriteLine($"User with email '{adminUserEmail}' is already in 'Admin' role.");
+                Console.WriteLine($"Failed to add user with email 'admin@gmail.com' to 'Admin' role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
         else
         {
-            Console.WriteLine($"Admin user with email '{adminUserEmail}' not found. Make sure a user with this email exists.");
+            Console.WriteLine($"User with email 'admin@gmail.com' is already in 'Admin' role.");
         }
     }
     else
     {
-        Console.WriteLine("Admin email not configured in 'AdminSettings:Email'.");
+        Console.WriteLine("Admin user with email 'admin@gmail.com' not found. Make sure a user with this email exists.");
     }
 }
 
