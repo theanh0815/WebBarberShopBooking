@@ -12,8 +12,8 @@ using WebBarberShopBooking.Models;
 namespace WebBarberShopBooking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250406051309_luc")]
-    partial class luc
+    [Migration("20250406235959_Luc")]
+    partial class Luc
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -392,6 +392,7 @@ namespace WebBarberShopBooking.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -439,14 +440,12 @@ namespace WebBarberShopBooking.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 

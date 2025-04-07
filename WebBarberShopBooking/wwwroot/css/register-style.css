@@ -1,0 +1,202 @@
+﻿/* Registration Page Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.register-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.register-title {
+    text-align: center;
+    color: #222;
+    margin-bottom: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid #c69c6d;
+    padding-bottom: 10px;
+}
+
+.form-subtitle {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* Form containers */
+.register-form-container, .external-auth-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -10px;
+    margin-left: -10px;
+    margin-bottom: 0;
+}
+
+    .form-row > .form-group {
+        padding-right: 10px;
+        padding-left: 10px;
+        margin-bottom: 20px;
+    }
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+    .form-control:focus {
+        border-color: #c69c6d;
+        box-shadow: 0 0 0 0.2rem rgba(198, 156, 109, 0.25);
+        outline: 0;
+    }
+
+/* Button styling */
+.btn-register {
+    width: 100%;
+    background-color: #c69c6d;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+    .btn-register:hover {
+        background-color: #a67c52;
+    }
+
+/* Login link */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+    .login-link a {
+        color: #c69c6d;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+/* External auth section */
+.external-auth-title {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.external-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.btn-social {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.btn-google {
+    background-color: #DB4437;
+}
+
+.btn-facebook {
+    background-color: #4267B2;
+}
+
+.btn-microsoft {
+    background-color: #00A4EF;
+}
+
+.btn-twitter {
+    background-color: #1DA1F2;
+}
+
+.btn-social:hover {
+    opacity: 0.9;
+}
+
+.btn-social i {
+    margin-right: 10px;
+}
+
+/* Image in external auth section */
+.register-image {
+    margin-top: 30px;
+    text-align: center;
+}
+
+    .register-image img {
+        max-width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+/* Validation styling */
+.text-danger {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+        .form-row > .form-group {
+            width: 100%;
+        }
+
+    .external-auth-container {
+        margin-top: 30px;
+    }
+}

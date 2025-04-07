@@ -128,7 +128,7 @@ namespace WebBarberShopBooking.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,IFormfile ImageFile")] Service service)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,ImageUrl")] Service service)
         {
             if (id != service.Id)
             {

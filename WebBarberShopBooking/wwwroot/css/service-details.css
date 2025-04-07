@@ -1,0 +1,235 @@
+﻿/* Enhanced Service Details Page Styling */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.service-details-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.service-title {
+    text-align: center;
+    color: #222;
+    margin-bottom: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid #c69c6d;
+    padding-bottom: 10px;
+}
+
+.service-details-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Image styling */
+.service-image-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.service-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Service info styling */
+.service-info {
+    padding: 30px;
+}
+
+.service-name {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.service-price {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #c69c6d;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.service-description {
+    margin-bottom: 25px;
+}
+
+    .service-description h4 {
+        color: #555;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .service-description p {
+        color: #666;
+        line-height: 1.7;
+    }
+
+/* Actions section */
+.service-actions {
+    margin-top: 25px;
+}
+
+/* Add to cart form */
+.add-to-cart-form {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.quantity-container {
+    margin-bottom: 15px;
+}
+
+    .quantity-container label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 500;
+    }
+
+.quantity-input {
+    display: flex;
+    align-items: center;
+    max-width: 150px;
+}
+
+.quantity-field {
+    width: 60px;
+    text-align: center;
+    padding: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    margin: 0;
+    font-size: 16px;
+}
+
+.quantity-btn {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #555;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+.minus-btn {
+    border-radius: 4px 0 0 4px;
+}
+
+.plus-btn {
+    border-radius: 0 4px 4px 0;
+}
+
+.quantity-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* Button styling */
+.btn-add-to-cart {
+    background-color: #c69c6d;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+    .btn-add-to-cart:hover {
+        background-color: #a67c52;
+    }
+
+/* Admin actions */
+.admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn-edit, .btn-back {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    text-align: center;
+    flex: 1;
+}
+
+.btn-edit {
+    background-color: white;
+    color: #c69c6d;
+    border: 1px solid #c69c6d;
+}
+
+.btn-back {
+    background-color: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.btn-edit:hover {
+    background-color: #c69c6d;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #ddd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .service-image-container {
+        padding: 15px;
+    }
+
+    .service-info {
+        padding: 20px;
+    }
+
+    .service-name {
+        font-size: 1.5rem;
+    }
+
+    .service-price {
+        font-size: 1.5rem;
+    }
+}
+
+/* For smaller screens, stack columns */
+@media (max-width: 767px) {
+    .service-image-container {
+        max-height: 300px;
+        overflow: hidden;
+    }
+}
