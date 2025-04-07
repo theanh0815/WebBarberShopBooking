@@ -1,55 +1,88 @@
-﻿@* Views/Admin/Users/Details.cshtml *@
-@model WebBarberShopBooking.Models.User
-
+﻿@model WebBarberShopBooking.Models.Service
 @{
-    ViewData["Title"] = "Chi tiết người dùng";
+    ViewData["Title"] = "Chi tiết dịch vụ";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/service-details.css" />
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="service-details-container">
+    <h1 class="service-title">CHI TIẾT DỊCH VỤ</h1>
 
-<div>
-    <h4>User</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-    </dl>
+    <div class="service-details-content">
+        <div class="row">
+            <!-- Left side - Service Image -->
+            <div class="col-md-5">
+                <div class="service-image-container">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="service-image" />
+                    }
+                    else
+                    {
+                        <img src="~/images/service-placeholder.jpg" alt="@Model.Name" class="service-image" />
+                    }
+                </div>
+            </div>
+
+            <!-- Right side - Service Info -->
+            <div class="col-md-7">
+                <div class="service-info">
+                    <h2 class="service-name">@Model.Name</h2>
+
+                    <div class="service-price">
+                        @Model.Price.ToString("C0")
+                    </div>
+
+                    <div class="service-description">
+                        <h4>Mô tả dịch vụ</h4>
+                        <p>@Model.Description</p>
+                    </div>
+
+                    <div class="service-actions">
+                        <form asp-controller="Order" asp-action="AddToCart" method="post" class="add-to-cart-form">
+                            <input type="hidden" name="serviceId" value="@Model?.Id" />
+                            <div class="quantity-container">
+                                <label for="quantity">Số lượng:</label>
+                                <div class="quantity-input">
+                                    <button type="button" class="quantity-btn minus-btn">-</button>
+                                    <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-field" />
+                                    <button type="button" class="quantity-btn plus-btn">+</button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-add-to-cart">THÊM VÀO GIỎ HÀNG</button>
+                        </form>
+
+                        <div class="admin-actions">
+                            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-edit">Chỉnh sửa</a>
+                            <a asp-action="Index" class="btn btn-back">Quay lại danh sách</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Sửa</a> |
-    <a asp-action="Index">Quay lại danh sách</a>
-</div>
+
+@section Scripts {
+    <script>
+        // JavaScript for quantity buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const minusBtn = document.querySelector('.minus-btn');
+            const plusBtn = document.querySelector('.plus-btn');
+            const quantityField = document.querySelector('.quantity-field');
+
+            minusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityField.value);
+                if (value > 1) {
+                    quantityField.value = value - 1;
+                }
+            });
+
+            plusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityField.value);
+                quantityField.value = value + 1;
+            });
+        });
+    </script>
+}

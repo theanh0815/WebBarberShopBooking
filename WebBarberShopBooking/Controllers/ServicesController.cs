@@ -4,6 +4,7 @@ using WebBarberShopBooking.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebBarberShopBooking.Controllers
 {
@@ -80,10 +81,10 @@ namespace WebBarberShopBooking.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,ImageUrl")] Service service)
         {
-            if (ModelState.IsValid)
+            if (service != null)
             {
                 try
-                {
+                {                    
                     _context.Add(service);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -96,6 +97,7 @@ namespace WebBarberShopBooking.Controllers
             }
             return View(service);
         }
+
 
         // GET: Service/Edit/5
         [Authorize(Roles = "Admin")]

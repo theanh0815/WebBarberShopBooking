@@ -24,6 +24,11 @@
                 <span asp-validation-for="PaymentMethod" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="OrderDate" class="control-label">Ngày đặt hàng</label>
+                <input asp-for="OrderDate" class="form-control" type="datetime-local" />
+                <span asp-validation-for="OrderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Đặt hàng" class="btn btn-primary" />
             </div>
         </form>

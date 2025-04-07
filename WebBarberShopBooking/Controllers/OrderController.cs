@@ -100,7 +100,7 @@ namespace WebBarberShopBooking.Controllers
                 }
                 else
                 {
-                    var service = await _context.Services.FindAsync(serviceId);
+                    var service1 = await _context.Services.FindAsync(serviceId);
                     if (service == null)
                     {
                         return NotFound();
@@ -204,12 +204,19 @@ namespace WebBarberShopBooking.Controllers
         // POST: Order/Checkout (Xử lý thanh toán)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout([Bind("Id,ShippingAddress,PaymentMethod")] Order order)
+        public async Task<IActionResult> Checkout([Bind("Id,ShippingAddress,PaymentMethod,OrderDate")] Order order)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    // Validation ví dụ: Ngày đặt phải lớn hơn ngày hiện tại
+                    if (order.OrderDate <= DateTime.Now)
+                    {
+                        ModelState.AddModelError("OrderDate", "Ngày đặt phải lớn hơn ngày hiện tại.");
+                        return View(order);
+                    }
+
                     order.Status = OrderStatus.Processing;
                     _context.Update(order);
 
@@ -233,6 +240,31 @@ namespace WebBarberShopBooking.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi khi thanh toán.");
+                return View("Error");
+            }
+        }
+
+
+        // GET: Order/PaymentSuccess (Hiển thị màn hình thanh toán thành công)
+        public async Task<IActionResult> PaymentSuccess(int orderId)
+        {
+            try
+            {
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Service)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    return NotFound();
+                }
+
+                return View(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi hiển thị màn hình thanh toán thành công.");
                 return View("Error");
             }
         }

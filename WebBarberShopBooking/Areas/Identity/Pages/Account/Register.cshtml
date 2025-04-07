@@ -1,0 +1,111 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Đăng Ký Tài Khoản";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/register-style.css" />
+}
+
+<div class="register-container">
+    <h1 class="register-title">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="register-form-container">
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <h2 class="form-subtitle">Tạo tài khoản mới</h2>
+                    <hr />
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Input.FirstName">Tên</label>
+                            <input asp-for="Input.FirstName" class="form-control" autocomplete="John" aria-required="true" placeholder="Nhập tên của bạn" />
+                            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Input.LastName">Họ</label>
+                            <input asp-for="Input.LastName" class="form-control" autocomplete="Doe" aria-required="true" placeholder="Nhập họ của bạn" />
+                            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.Email">Email</label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="email@example.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.PhoneNumber">Số điện thoại</label>
+                        <input asp-for="Input.PhoneNumber" class="form-control" autocomplete="username" aria-required="true" placeholder="0123456789" />
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Input.Password">Mật khẩu</label>
+                            <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Nhập mật khẩu" />
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Input.ConfirmPassword">Xác nhận mật khẩu</label>
+                            <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Nhập lại mật khẩu" />
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button id="registerSubmit" type="submit" class="btn btn-register">Đăng Ký</button>
+
+                    <div class="login-link">
+                        Đã có tài khoản? <a asp-page="./Login">Đăng nhập</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="external-auth-container">
+                <h3 class="external-auth-title">Đăng ký với dịch vụ khác</h3>
+                <hr />
+                @{
+                    if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                    {
+                        <div class="no-external-services">
+                            <p>
+                                Chưa có dịch vụ xác thực bên ngoài được cấu hình. Xem <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
+                                    bài viết
+                                    này để cài đặt ASP.NET hỗ trợ đăng nhập qua dịch vụ bên ngoài
+                                </a>.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <div class="external-buttons">
+                                @foreach (var provider in Model.ExternalLogins!)
+                                {
+                                    <button type="submit" class="btn btn-social btn-@provider.Name.ToLower()" name="provider" value="@provider.Name" title="Đăng nhập bằng tài khoản @provider.DisplayName">
+                                        <i class="icon-@provider.Name.ToLower()"></i> @provider.DisplayName
+                                    </button>
+                                }
+                            </div>
+                        </form>
+                    }
+                }
+
+                <div class="register-image">
+                    <img src="https://static.vecteezy.com/system/resources/previews/000/081/714/original/retro-barber-shop-vector-background.jpg" alt="Barber Shop" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

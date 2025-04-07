@@ -1,0 +1,99 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Đăng Nhập";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/css/login-style.css" />
+}
+
+<div class="login-container">
+    <h1 class="login-title">@ViewData["Title"]</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="login-form-container">
+                <form id="account" method="post">
+                    <h2 class="form-subtitle">Đăng nhập với tài khoản của bạn</h2>
+                    <hr />
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.Email">Email</label>
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="email@example.com" />
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Input.Password">Mật khẩu</label>
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Nhập mật khẩu" />
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Input.RememberMe" />
+                        <label class="form-check-label" asp-for="Input.RememberMe">
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+
+                    <button id="login-submit" type="submit" class="btn btn-login">Đăng Nhập</button>
+
+                    <div class="login-options">
+                        <p>
+                            <a id="forgot-password" asp-page="./ForgotPassword">Quên mật khẩu?</a>
+                        </p>
+                        <p>
+                            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Đăng ký tài khoản mới</a>
+                        </p>
+                        <p>
+                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Gửi lại email xác nhận</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="external-auth-container">
+                <h3 class="external-auth-title">Đăng nhập với dịch vụ khác</h3>
+                <hr />
+                @{
+                    if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                    {
+                        <div class="no-external-services">
+                            <p>
+                                Chưa có dịch vụ xác thực bên ngoài được cấu hình. Xem <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
+                                    bài viết
+                                    này để cài đặt ASP.NET hỗ trợ đăng nhập qua dịch vụ bên ngoài
+                                </a>.
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                            <div class="external-buttons">
+                                @foreach (var provider in Model.ExternalLogins!)
+                                {
+                                    <button type="submit" class="btn btn-social btn-@provider.Name.ToLower()" name="provider" value="@provider.Name" title="Đăng nhập bằng tài khoản @provider.DisplayName">
+                                        <i class="icon-@provider.Name.ToLower()"></i> @provider.DisplayName
+                                    </button>
+                                }
+                            </div>
+                        </form>
+                    }
+                }
+
+                <div class="login-image">
+                    <img src="https://static.vecteezy.com/system/resources/previews/000/081/714/original/retro-barber-shop-vector-background.jpg" alt="Barber Shop" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

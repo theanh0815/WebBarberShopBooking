@@ -19,7 +19,7 @@ namespace WebBarberShopBooking.Models
         [Range(0, double.MaxValue, ErrorMessage = "Giá phải là một số dương.")]
         public decimal Price { get; set; }
 
-        public string? ImageUrl { get; set; } // Đường dẫn đến hình ảnh dịch vụ
+        public string ImageUrl { get; set; } // Đường dẫn đến hình ảnh dịch vụ
 
         // Navigation property
         public ICollection<Appointment> Appointments { get; set; }

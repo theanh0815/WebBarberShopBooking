@@ -12,8 +12,8 @@ using WebBarberShopBooking.Models;
 namespace WebBarberShopBooking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250406032042_NewMigrations")]
-    partial class NewMigrations
+    [Migration("20250406052739_AddEmail")]
+    partial class AddEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -338,7 +338,12 @@ namespace WebBarberShopBooking.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Promotions");
+                    b.ToTable("Promotions", t =>
+                        {
+                            t.HasCheckConstraint("CK_check_date", "[EndDate] > [StartDate]");
+
+                            t.HasCheckConstraint("CK_check_promo", "[DiscountPercentage] IS NULL OR ([DiscountPercentage] > 0 AND [DiscountPercentage] <= 1)");
+                        });
                 });
 
             modelBuilder.Entity("WebBarberShopBooking.Models.Review", b =>
@@ -434,14 +439,12 @@ namespace WebBarberShopBooking.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
