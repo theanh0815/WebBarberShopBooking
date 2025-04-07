@@ -1,7 +1,90 @@
 ﻿@model WebBarberShopBooking.Models.Service
-
 @{
-    ViewData["Title"] = "CHI TIẾT";
+    ViewData["Title"] = "Chi tiết dịch vụ";
+}
+@section Styles{
+    <link href="~/css/service-details.css" rel="stylesheet" />
+}
+<div class="service-details-container">
+    <h1 class="service-title">CHI TIẾT DỊCH VỤ</h1>
+
+
+    <div class="service-details-content">
+        <div class="row">
+            <!-- Left side - Service Image -->
+            <div class="col-md-5">
+                <div class="service-image-container">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="service-image" />
+                    }
+                    else
+                    {
+                        <img src="~/images/service-placeholder.jpg" alt="@Model.Name" class="service-image" />
+                    }
+                </div>
+            </div>
+
+            <!-- Right side - Service Info -->
+            <div class="col-md-7">
+                <div class="service-info">
+                    <h2 class="service-name">@Model.Name</h2>
+
+                    <div class="service-price">
+                        @Model.Price.ToString("C0")
+                    </div>
+
+                    <div class="service-description">
+                        <h4>Mô tả dịch vụ</h4>
+                        <p>@Model.Description</p>
+                    </div>
+
+                    <div class="service-actions">
+                        <form asp-controller="Order" asp-action="AddToCart" method="post" class="add-to-cart-form">
+                            <input type="hidden" name="serviceId" value="@Model?.Id" />
+                            <div class="quantity-container">
+                                <label for="quantity">Số lượng:</label>
+                                <div class="quantity-input">
+                                    <button type="button" class="quantity-btn minus-btn">-</button>
+                                    <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-field" />
+                                    <button type="button" class="quantity-btn plus-btn">+</button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-add-to-cart">THÊM VÀO GIỎ HÀNG</button>
+                        </form>
+
+                        <div class="admin-actions">
+                            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-edit">Chỉnh sửa</a>
+                            <a asp-action="Index" class="btn btn-back">Quay lại danh sách</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript for quantity buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const minusBtn = document.querySelector('.minus-btn');
+            const plusBtn = document.querySelector('.plus-btn');
+            const quantityField = document.querySelector('.quantity-field');
+
+            minusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityField.value);
+                if (value > 1) {
+                    quantityField.value = value - 1;
+                }
+            });
+
+            plusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityField.value);
+                quantityField.value = value + 1;
+            });
+        });
+    </script>
 }
 
 <h1>CHI TIẾT DỊCH VỤ</h1>
@@ -52,3 +135,4 @@
         <button type="submit" class="btn btn-primary">Add to Cart</button>
     </form>
 </div>
+
