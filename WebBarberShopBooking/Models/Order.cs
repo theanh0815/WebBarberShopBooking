@@ -26,7 +26,7 @@ namespace WebBarberShopBooking.Models
 
         public string? ShippingAddress { get; set; }
 
-        
+
         public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 
@@ -34,16 +34,15 @@ namespace WebBarberShopBooking.Models
     {
         Pending,
         Processing,
-        Shipped,
-        Delivered,
         Completed,
         Cancelled
     }
 
     public enum PaymentMethod
     {
-        Momo, // Ví điện tử Momo
-        TheNganHang, // Thẻ ngân hàng
+        COD,
+        MoMo,
+        Card,
         TaiCho
     }
 }

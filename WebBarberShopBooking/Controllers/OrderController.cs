@@ -204,12 +204,19 @@ namespace WebBarberShopBooking.Controllers
         // POST: Order/Checkout (Xử lý thanh toán)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout([Bind("Id,ShippingAddress,PaymentMethod")] Order order)
+        public async Task<IActionResult> Checkout([Bind("Id,ShippingAddress,PaymentMethod,OrderDate")] Order order)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
+                    // Validation ví dụ: Ngày đặt phải lớn hơn ngày hiện tại
+                    if (order.OrderDate <= DateTime.Now)
+                    {
+                        ModelState.AddModelError("OrderDate", "Ngày đặt phải lớn hơn ngày hiện tại.");
+                        return View(order);
+                    }
+
                     order.Status = OrderStatus.Processing;
                     _context.Update(order);
 
@@ -223,30 +230,10 @@ namespace WebBarberShopBooking.Controllers
                     await _context.SaveChangesAsync();
 
                     // Xử lý logic thanh toán
-                    switch (order.PaymentMethod)
-                    {
-                        case PaymentMethod.Momo:
-                            // TODO: Tích hợp API Momo (sẽ cần thêm logic phức tạp hơn)
-                            _logger.LogInformation($"Đơn hàng {order.Id} đang chờ thanh toán Momo.");
-                            // Ví dụ đơn giản: Chuyển hướng đến trang Momo, sau khi thanh toán Momo sẽ callback về 1 action khác
-                            // return RedirectToAction("MomoPayment", new { orderId = order.Id }); 
-                            break;
-                        case PaymentMethod.TheNganHang:
-                            // TODO: Tích hợp API thẻ ngân hàng
-                            _logger.LogInformation($"Đơn hàng {order.Id} đang chờ thanh toán thẻ ngân hàng.");
-                            break;
-                        case PaymentMethod.TaiCho:
-                            // Thanh toán tại chỗ (có thể chỉ cần cập nhật trạng thái)
-                            _logger.LogInformation($"Đơn hàng {order.Id} thanh toán tại chỗ.");
-                            order.Status = OrderStatus.Completed; // Hoặc một trạng thái phù hợp
-                            _context.Update(order);
-                            await _context.SaveChangesAsync();
-                            break;
-                    }
+                    // ...
 
-                    //TempData["SuccessMessage"] = "Đặt hàng thành công!";
-                    //return RedirectToAction(nameof(History));
-                    return RedirectToAction(nameof(PaymentSuccess), new { orderId = order.Id });
+                    TempData["SuccessMessage"] = "Đặt hàng thành công!";
+                    return RedirectToAction(nameof(History));
                 }
                 return View(order);
             }
@@ -256,6 +243,7 @@ namespace WebBarberShopBooking.Controllers
                 return View("Error");
             }
         }
+
 
         // GET: Order/PaymentSuccess (Hiển thị màn hình thanh toán thành công)
         public async Task<IActionResult> PaymentSuccess(int orderId)
