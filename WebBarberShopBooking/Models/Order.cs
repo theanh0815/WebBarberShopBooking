@@ -42,7 +42,8 @@ namespace WebBarberShopBooking.Models
 
     public enum PaymentMethod
     {
-        COD,
-        EmailSent
+        Momo, // Ví điện tử Momo
+        TheNganHang, // Thẻ ngân hàng
+        TaiCho
     }
 }

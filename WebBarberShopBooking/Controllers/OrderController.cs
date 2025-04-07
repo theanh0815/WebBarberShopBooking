@@ -223,16 +223,60 @@ namespace WebBarberShopBooking.Controllers
                     await _context.SaveChangesAsync();
 
                     // Xử lý logic thanh toán
-                    // ...
+                    switch (order.PaymentMethod)
+                    {
+                        case PaymentMethod.Momo:
+                            // TODO: Tích hợp API Momo (sẽ cần thêm logic phức tạp hơn)
+                            _logger.LogInformation($"Đơn hàng {order.Id} đang chờ thanh toán Momo.");
+                            // Ví dụ đơn giản: Chuyển hướng đến trang Momo, sau khi thanh toán Momo sẽ callback về 1 action khác
+                            // return RedirectToAction("MomoPayment", new { orderId = order.Id }); 
+                            break;
+                        case PaymentMethod.TheNganHang:
+                            // TODO: Tích hợp API thẻ ngân hàng
+                            _logger.LogInformation($"Đơn hàng {order.Id} đang chờ thanh toán thẻ ngân hàng.");
+                            break;
+                        case PaymentMethod.TaiCho:
+                            // Thanh toán tại chỗ (có thể chỉ cần cập nhật trạng thái)
+                            _logger.LogInformation($"Đơn hàng {order.Id} thanh toán tại chỗ.");
+                            order.Status = OrderStatus.Completed; // Hoặc một trạng thái phù hợp
+                            _context.Update(order);
+                            await _context.SaveChangesAsync();
+                            break;
+                    }
 
-                    TempData["SuccessMessage"] = "Đặt hàng thành công!";
-                    return RedirectToAction(nameof(History));
+                    //TempData["SuccessMessage"] = "Đặt hàng thành công!";
+                    //return RedirectToAction(nameof(History));
+                    return RedirectToAction(nameof(PaymentSuccess), new { orderId = order.Id });
                 }
                 return View(order);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Lỗi khi thanh toán.");
+                return View("Error");
+            }
+        }
+
+        // GET: Order/PaymentSuccess (Hiển thị màn hình thanh toán thành công)
+        public async Task<IActionResult> PaymentSuccess(int orderId)
+        {
+            try
+            {
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Service)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    return NotFound();
+                }
+
+                return View(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi hiển thị màn hình thanh toán thành công.");
                 return View("Error");
             }
         }
