@@ -66,8 +66,11 @@ namespace WebBarberShopBooking.Controllers {
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Service service, IFormFile ImageUrl) {
             try {
-                if (ImageUrl != null)
-                    service.ImageUrl = await SaveImage(ImageUrl, service.Id.ToString());
+                if (ImageUrl != null) {
+                    var extension = Path.GetExtension(ImageUrl.FileName);
+                    var fileName = service.Id.ToString() + extension;
+                    service.ImageUrl = await SaveImage(ImageUrl, fileName);
+                }
                 await _serviceRepository.AddServiceAsync(service);
                 return RedirectToAction(nameof(Index));
             } catch {
@@ -80,7 +83,7 @@ namespace WebBarberShopBooking.Controllers {
             using (var fileStream = new FileStream(savePath, FileMode.Create)) {
                 await image.CopyToAsync(fileStream);
             }
-            return "images/" + image.FileName;
+            return "images/" + fileName;
         }
 
         // GET: Service/Edit/5
