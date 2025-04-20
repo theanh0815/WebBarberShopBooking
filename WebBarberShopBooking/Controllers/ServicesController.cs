@@ -60,6 +60,15 @@ namespace WebBarberShopBooking.Controllers {
         }
 
         // POST: Service/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(Service service, IFormFile ImageUrl) {
+            try {
+                if (ImageUrl != null) {
+                    var extension = Path.GetExtension(ImageUrl.FileName);
+                    var fileName = Guid.NewGuid().ToString() + extension;
+                    service.ImageUrl = await SaveImage(ImageUrl, fileName);
                 }
                 await _serviceRepository.AddServiceAsync(service);
                 return RedirectToAction(nameof(Index));
@@ -92,6 +101,8 @@ namespace WebBarberShopBooking.Controllers {
         }
 
         // POST: Service/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, Service service, IFormFile ImageFile) {
             if (id != service.Id) {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WebBarberShopBooking.Migrations
 {
     /// <inheritdoc />
-    public partial class cc : Migration
+    public partial class lol : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

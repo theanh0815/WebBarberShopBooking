@@ -12,8 +12,8 @@ using WebBarberShopBooking.Models;
 namespace WebBarberShopBooking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250407032124_cc")]
-    partial class cc
+    [Migration("20250413142638_lol")]
+    partial class lol
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

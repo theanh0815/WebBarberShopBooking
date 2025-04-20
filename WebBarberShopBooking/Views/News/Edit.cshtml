@@ -1,45 +1,181 @@
 ﻿@model WebBarberShopBooking.Models.News
-
 @{
-    ViewData["Title"] = "Thêm tin tức";
+    ViewData["Title"] = "Chỉnh sửa tin tức";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container py-4">
+    <div class="card border-0 shadow">
+        <div class="card-header bg-warning text-dark">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-edit fa-2x me-3"></i>
+                <div>
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                    <p class="mb-0 small">Cập nhật thông tin bài viết tin tức</p>
+                </div>
+            </div>
+        </div>
 
-<h4>News</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="form-control"></textarea>
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Thêm" class="btn btn-primary" />
-            </div>
-        </form>
+        <div class="card-body p-4">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold">
+                                <i class="fas fa-heading me-1"></i> Tiêu đề
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg" placeholder="Nhập tiêu đề tin tức" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                            <div class="form-text">Tiêu đề nên ngắn gọn, hấp dẫn và mô tả chính xác nội dung bài viết</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Content" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-1"></i> Nội dung
+                            </label>
+                            <textarea asp-for="Content" class="form-control" rows="12" placeholder="Nhập nội dung chi tiết của tin tức"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-image me-1"></i> Hình ảnh</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="ImageUrl" class="form-label">URL hình ảnh</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                        <input asp-for="ImageUrl" class="form-control" placeholder="Nhập URL hình ảnh" />
+                                    </div>
+                                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                                </div>
+
+                                <div class="text-center mt-3">
+                                    <div class="image-preview bg-light border rounded p-2 d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <img id="preview" src="@Model.ImageUrl" alt="Preview" class="img-fluid @(string.IsNullOrEmpty(Model.ImageUrl) ? "d-none" : "")" style="max-height: 180px;" />
+                                        <div id="placeholder" class="text-secondary @(string.IsNullOrEmpty(Model.ImageUrl) ? "" : "d-none")">
+                                            <i class="fas fa-image fa-3x mb-2"></i>
+                                            <p class="mb-0">Xem trước hình ảnh</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-1"></i> Thông tin xuất bản</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label asp-for="PublishDate" class="form-label">Ngày xuất bản</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                        <input asp-for="PublishDate" type="datetime-local" class="form-control" />
+                                    </div>
+                                    <span asp-validation-for="PublishDate" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="featuredNews">
+                                    <label class="form-check-label" for="featuredNews">
+                                        Đánh dấu là tin nổi bật
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-history me-1"></i> Lịch sử</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted">Ngày tạo:</span>
+                                    <span class="fw-bold">@Model.PublishDate.ToString("dd/MM/yyyy")</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Lần sửa cuối:</span>
+                                    <span class="fw-bold">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+                    </a>
+                    <div>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-info me-2">
+                            <i class="fas fa-eye me-1"></i> Xem
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-1"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Quay lại danh sách</a>
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function() {
+            // Xử lý xem trước hình ảnh
+            $('#ImageUrl').on('input', function() {
+                const imageUrl = $(this).val();
+                if (imageUrl) {
+                    $('#preview').attr('src', imageUrl).removeClass('d-none');
+                    $('#placeholder').addClass('d-none');
+                } else {
+                    $('#preview').addClass('d-none');
+                    $('#placeholder').removeClass('d-none');
+                }
+            });
+
+            // Xử lý editor nội dung phong phú nếu có thư viện tích hợp
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '#Content',
+                    height: 500,
+                    plugins: 'link image code table lists',
+                    toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image | code'
+                });
+            }
+
+            // Hiệu ứng khi trang load
+            $('.card').hide().fadeIn(500);
+
+            // Hiển thị xác nhận khi có thay đổi
+            let originalForm = $('form').serialize();
+
+            $('form :input').on('change input', function() {
+                if ($('form').serialize() !== originalForm) {
+                    $('.btn-warning').addClass('btn-pulse').text('Lưu thay đổi*');
+                } else {
+                    $('.btn-warning').removeClass('btn-pulse').text('Lưu thay đổi');
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .btn-pulse {
+            animation: pulse 2s infinite;
+        }
+
+    </style>
 }
