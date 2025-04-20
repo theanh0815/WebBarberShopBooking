@@ -2,8 +2,7 @@
 @{
     ViewData["Title"] = "Tạo mới dịch vụ";
 }
-
-@section Styles{
+@section Styles {
     <link rel="stylesheet" href="~/css/edit-service.css" />
 }
 
@@ -48,8 +47,8 @@
                         <div class="mb-4">
                             <label class="form-label fw-bold">Hình ảnh dịch vụ</label>
                             <div class="file-input-wrapper">
-                                <label asp-for="ImageUrl">Hình ảnh</label>
-                                <input type="file" asp-for="ImageUrl" class="form-control" />
+                                <label asp-for="ImageUrl" class="control-label"></label>
+                                <input type = "file" asp-for="ImageUrl" class="form-control" />
                                 <span asp-validation-for="ImageUrl" class="text-danger"></span>
                             </div>
                             <div class="form-text">Chọn một file hình ảnh (JPG, PNG, WEBP...)</div>
@@ -64,37 +63,6 @@
                             </a>
                         </div>
                     </form>
-=======
-
-<h1>TẠO MỚI SẢN PHẨM</h1>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group mb-3">
-                <label asp-for="Name" class="control-label">Tên dịch vụ</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Description" class="control-label">Mô tả</label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="Price" class="control-label">Giá (VNĐ)</label>
-                <input type="number" asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <label asp-for="ImageUrl">Hình ảnh</label>
-                <input type="file" asp-for="ImageUrl" class="form-control" accept="image/*" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-3">
-                <div class="mt-2" id="imagePreview" style="display:none;">
-                    <img id="preview" src="#" alt="Xem trước hình ảnh" class="img-thumbnail" style="max-height: 200px;" />
                 </div>
             </div>
         </div>
@@ -121,7 +89,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
     <script>
         // Live preview functionality
         $(document).ready(function() {
@@ -160,7 +127,4 @@
             });
         });
     </script>
-
-    
-
 }
